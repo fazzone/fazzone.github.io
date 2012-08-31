@@ -28,13 +28,39 @@
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
         
-		<h3>overview</h3>
+		<div style="background-color: rgb(230,230,230);">
+		  <h3>contents</h3>
+		  <ol>
+			<li><a href="#overview">overview</a></li>
+			<li><a href="#usage">how to use</a></li>
+			
+			<li>
+			  <a href="#security">note on security</a>
+			  <ul>
+				<li><a href="#xss">javascript, cookies, and the same-origin policy</a></li>
+				<li><a href="#cookiestealing">a cookie-stealing attack</a></li>
+			  </ul>
+			</li>
+			
+			<li><a href="#problems">if it doesn't work</a></li>
+			
+			<li>
+			  <a href="#programmers">for the programmers in the audience</a>
+			  <ul>
+				<li><a href="#implementation">implementation notes</a></li>
+				<li><a href="#hacking">hacking</a></li>
+			  </ul>
+			</li>
+		  </ol>
+		</div>
+		
+		<h3 id="overview">overview</h3>
 		<p>
 		  This is an automated generator of nice graphical schedules for UT Austin students.  <strong>Note: This process involves running untrusted scripts on a page
 		  that contains sensitive information.</strong>  I assure you that I am not stealing your information or doing anything  malicious, but if you
-		  would like to make an informed decision instead of just taking my word for it, please read the "note on security" below.
+		  would like to make an informed decision instead of just taking my word for it, please read the <a href="#security">note on security</a> below.
 		</p>
-		<h3>how to use</h3>
+		<h3 id="usage">how to use</h3>
 		<p>
 		  <ol>
 			<li>Drag this link to your bookmarks bar:
@@ -43,7 +69,7 @@
 			  </a>
 			</li>
 			<li>
-			  Go to the "Current Course Schedule" page of UT Direct: <a href="https://utdirect.utexas.edu/registration/classlist.WBX"> link </a>
+			  Go to the "<a href="https://utdirect.utexas.edu/registration/classlist.WBX">Current Course Schedule</a>" page of UT Direct
 			</li>
 			<li>
 			  Click the bookmark that you just made -- you should be redirected to a nice graphical representation of your schedule.
@@ -51,9 +77,9 @@
 		  </ol>
 		</p>
 		
-		<h3>note on security</h3>
+		<h3 id="security">note on security</h3>
 		<div style="padding-left: 20px">
-		<h4>javascript, cookies, and the same-origin policy</h4>
+		<h4 id="xss">javascript, cookies, and the same-origin policy</h4>
 		<p>
 		  The above link/bookmarklet contains Javascript code that is executed by your browser when you click on it.  Modern browsers, in an attempt to foil
 		  cross-site-scripting (XSS) attacks, implement a "same-origin policy" (<a href="https://en.wikipedia.org/wiki/Same_origin_policy">wikipedia</a>) for scripts - 
@@ -65,7 +91,7 @@
 		  so that you needn't re-type your password when you open the page up again.  Essentially, once you type your password in once, the login cookie
 		  identifies you (for a certain time) -- so anyone else, as long as they had your login cookie, could impersonate you.
 		</p>
-		<h4>a cookie-stealing attack</h4>
+		<h4 id="cookiestealing">a cookie-stealing attack</h4>
 		<p>
 		  When you click on the bookmark, you are (in effect) throwing away the protection in your browser against the following attack, known as a 
 		  "cookie-stealing attack" (<a href="https://en.wikipedia.org/wiki/HTTP_cookie#Cross-site_scripting_.E2.80.93_cookie_theft">wikipedia</a>), which works as follows:
@@ -94,7 +120,7 @@ javascript:(	//Tell the browser to interpret the rest of the "URL" as Javascript
 
 		</div>
 		
-		<h3>if it doesn't work</h3>
+		<h3 id="problems">if it doesn't work</h3>
 		<p>
 		  This has only been tested on a fairly small sample of schedules, so it's quite likely there are a multitude of bugs.  I would expect it to work in
 		  current versions of Chrome and Firefox, but I do not have much hope for even current versions of Internet Explorer.  If you encounted a bug, or you 
@@ -102,9 +128,9 @@ javascript:(	//Tell the browser to interpret the rest of the "URL" as Javascript
 		  contents of your URL bar and send it to me at rmcq@utexas.edu.
 		</p>
 
-		<h3>for the programmers in the audience</h3>
+		<h3 id="programmers">for the programmers in the audience</h3>
 		<div style="padding-left:20px">
-		  <h4>implemtation notes</h4>
+		  <h4 id="implementation">implemtation notes</h4>
 		  <div style="padding-left:20px">
 			This program consists of two parts:
 			<ul>
@@ -116,7 +142,7 @@ javascript:(	//Tell the browser to interpret the rest of the "URL" as Javascript
 			  schedule.html is a wrapper for the real program code, which is in <a href="https://github.com/fazzone/fazzone.github.com/blob/master/javascripts/sched.js">sched.js</a>.  
 			sched.js has two major sections, the parsing section (first) and the drawing section (after).  Drawing is done using a Canvas element.
 		  </div>
-		  <h4>hacking</h4>
+		  <h4 id="hacking">hacking</h4>
 		  <div style="padding-left:20px">
 			This code is still very much in development.  Here are some questions, tasks, and notes if you want to contribute:
 			<ul>
