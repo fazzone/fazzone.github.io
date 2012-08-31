@@ -35,16 +35,6 @@ function createTime24(h, m) {
 }
 
 function getHours24(t) {
-	/*
-
---hours in 12hr clock, boolean for PM -> hours in 24hr clock
-convert24 :: Int -> Bool -> Int
-convert24 h pm
-  | not pm && h == 12 = 0
-  | pm && h < 12 = h + 12
-  | otherwise = h
-
-	 */
 	if (!t.isPM && t.hours == 12)
 		return 0;
 	if (t.isPM && t.hours < 12)
@@ -184,10 +174,21 @@ var drawingParams = {
     endHour: 18		
 };
 
-function calculateDefaultParams() {
+function calculateDefaultParams(struct) {
     //1 + the actual value here because we need the extra row/col for the grid labels
     drawingParams.colWidth = (window.innerWidth - drawingParams.edgeBufPx) / (1 + 5);
     drawingParams.rowHeight = (window.innerHeight - drawingParams.edgeBufPx) / (1 + drawingParams.endHour - drawingParams.startHour);
+	//let's construct the viewing window so that we have some buffer on each size
+	
+	var minH = 25, maxH = -1;
+	for (var i = 0; i < struct.length; i++)
+		for (var j = 0; j < struct[i].sessions.length; j++) {
+			minH = Math.min(getHours24(struct[i].sessions[j].time), minH);
+			maxH = Math.max(getHours24(struct[i].sessions[j].time), maxH);
+							
+		}
+	drawingParams.startHour = minH - 1;
+	drawingParams.endHour = maxH + 1;
 }
 
 //drawing stuff
@@ -196,7 +197,7 @@ function translate(r, xi, yi) {
 }
 
 function draw(struct) {
-    calculateDefaultParams();
+    calculateDefaultParams(struct);
     canvas = document.getElementById("schc");
     c = canvas.getContext('2d');
     c.strokeStyle = "black";
@@ -204,7 +205,6 @@ function draw(struct) {
     drawLabels(c);
     c.translate(drawingParams.colWidth, drawingParams.rowHeight);
     drawGrid(c);
-	console.log("struct =", struct, struct.length);
 	
 	c.font = "10pt Sans";
 	for (var i=0;  i <struct.length; i++) {
