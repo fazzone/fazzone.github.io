@@ -97,14 +97,42 @@ javascript:(	//Tell the browser to interpret the rest of the "URL" as Javascript
 		<p>
 		  This has only been tested on a fairly small sample of schedules, so it's quite likely there are a multitude of bugs.  I would expect it to work in
 		  current versions of Chrome and Firefox, but I do not have much hope for even current versions of Internet Explorer.  If you encounted a bug, or you 
-		  believe the output is incorrect (not consistent with your schedule as described by the table in the "Current Course Schedule" page, please copy the
+		  believe the output is incorrect (not consistent with your schedule as described by the table in the "Current Course Schedule" page), please copy the
 		  contents of your URL bar and send it to me an email at rmcq@utexas.edu.
 		</p>
 
-		<h3>technical notes - overview</h3>
-		<p>
-		  coming soon
-		</p>
+		<h3>for the programmers in the audience</h3>
+		<div style="padding-left:20px">
+		  <h4>implemtation notes</h4>
+		  <div style="padding-left:20px">
+			This program consists of two parts:
+			<ul>
+			  <li>The bookmarklet code, which extracts the HTML code of your schedule-table</li>
+			  <li>The actual parsing and rendering logic, which does everything else</li>
+		  </ul>
+			So you run the bookmarklet code on the schedule page, and it takes the table HTML and basically pastes it (after some regex replacements to eliminate
+			unnecessary information) on the end of a URL that points to <a href="https://github.com/fazzone/fazzone.github.com/blob/master/schedule.html">schedule.html</a>.
+			  schedule.html is a wrapper for the real program code, which is in <a href="https://github.com/fazzone/fazzone.github.com/blob/master/javascripts/sched.js">sched.js</a>.  
+			sched.js has two major sections, the parsing section (first) and the drawing section (after).  Drawing is done using a Canvas element.
+		  </div>
+		  <h4>hacking</h4>
+		  <div style="padding-left:20px">
+			This code is still very much in development.  Here are some questions, tasks, and notes if you want to contribute:
+			<ul>
+			  <li>Internet Explorer compatibility: IE supports Canvas, so what gives?</li>
+			  <li>Customization page with options to set class names, colors, etc.</li>
+			  <li>Should 
+				<a href="https://github.com/fazzone/fazzone.github.com/blob/master/javascripts/sched.js">sched.js</a>
+				be split into two files; one for parsing, one for drawing?  (I'm probably going to do this soon)</li>
+			  <li>Is the "convert to PNG" button good, or can it be improved?</li>
+			  <li>What other things can go in the "controls" section?</li>
+			  <li>Code style/general:  I hacked this together pretty quick in an unfamiliar language, so if you know
+				any ways to refactor it to be cleaner / clearer / more idiomatic, please let me know!</li>
+			  <li>It would be pretty cool if it integrated with the <a href="https://developers.google.com/google-apps/calendar/">Google Calendar API</a>
+				and automatically entered all your classes into your Google calender for you or something</li>
+			</ul>
+		  </div>
+		</div>
 		
       </section>
     </div>
