@@ -183,8 +183,8 @@ function calculateDefaultParams(struct) {
 	var minH = 25, maxH = -1;
 	for (var i = 0; i < struct.length; i++)
 		for (var j = 0; j < struct[i].sessions.length; j++) {
-			minH = Math.min(getHours24(struct[i].sessions[j].time), minH);
-			maxH = Math.max(getHours24(struct[i].sessions[j].time), maxH);
+			minH = Math.min(getHours24(struct[i].sessions[j].time.begin), minH);
+			maxH = Math.max(getHours24(struct[i].sessions[j].time.end), maxH);
 							
 		}
 	drawingParams.startHour = minH - 1;
