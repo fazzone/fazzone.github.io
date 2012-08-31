@@ -96,6 +96,18 @@ function dayOrdinal(d) {
 	return dayNames.indexOf(d);
 }
 
+//misc
+/*A huge security hole -- it would allow the admins of UT Direct (unlikely) to
+sneak Javascript code (in <script> tags or whatever) into the schedule-table (unlikely) 
+which could then be used to steal our data or something -- all of which comes from them,
+so I see no reason to make this function "secure" */
+function entityDecode(str) {
+	var div = document.createElement('div');
+	div.innerHTML = str;
+	return div.textContent;
+}
+
+
 //pass in a <tr> DOM object; get an array of Session objects
 function parseClass(tr) {
     var cells = tr.getElementsByTagName("td");
@@ -104,7 +116,7 @@ function parseClass(tr) {
     //First the easy ones
     var uniqueID = cells[0].innerHTML.trim();
     var course   = cells[1].innerHTML.trim();
-    var title    = cells[2].innerHTML.trim();
+    var title    = entityDecode(cells[2].innerHTML.trim());	//for &amp;s and the like
     //Now things get tricky.  When a class has multiple locations,times etc
     //UTDirect gives up a table with <br>s in the <td>s -- so we'll have to
     //read those and do a sort of transpose to get what we want.
@@ -160,29 +172,30 @@ function readClasses(htmlstr) {
     return vs;
 }
 
-var drawParams = {
-    colWidth: 256,	//one day == one col
-    rowHeight: 128,	//one hour == one row
-    edgeBufPx: 50,
+function calculateDefaultParams(classes) {
+    //defaults
+	var drawParams = {
+		colWidth: 256,	//one day == one col
+		rowHeight: 128,	//one hour == one row
+		edgeBufPx: 50,
+		
+		lineWidth: 2,
+		
+		controlDivEdgeBuf: 10,
+		
+		textFont: "16pt Sans",
+		lineSpacing: 18,
+		textColor: "black",
+		
+		colors: ["red", "green", "blue", "yellow", "purple", "orange", "cyan"]
+	};
 	
-
-    textFont: "16pt Sans",
-	lineSpacing: 18,
-	textColor: "black",
-
-	colors: ["red", "green", "blue", "yellow", "purple", "orange", "cyan"]
-//    ,startHour: 6,	//24-hour clock hours
-//    endHour: 20		
-};
-
-function calculateDefaultParams(struct) {
-    //let's construct the viewing window so that we have some buffer on each size
-	
+	//let's conclasses the viewing window so that we have some buffer on each size	
 	var minH = 25, maxH = -1;
-	for (var i = 0; i < struct.length; i++)
-		for (var j = 0; j < struct[i].sessions.length; j++) {
-			minH = Math.min(getHours24(struct[i].sessions[j].time.begin), minH);
-			maxH = Math.max(getHours24(struct[i].sessions[j].time.end), maxH);
+	for (var i = 0; i < classes.length; i++)
+		for (var j = 0; j < classes[i].sessions.length; j++) {
+			minH = Math.min(getHours24(classes[i].sessions[j].time.begin), minH);
+			maxH = Math.max(getHours24(classes[i].sessions[j].time.end), maxH);
 		}
 	drawParams.startHour = minH - 1;
 	drawParams.endHour = maxH + 1;
@@ -190,7 +203,7 @@ function calculateDefaultParams(struct) {
 	//1 + the actual value here because we need the extra row/col for the grid labels
     drawParams.colWidth = (window.innerWidth - drawParams.edgeBufPx) / (1 + 5);
     drawParams.rowHeight = (window.innerHeight - drawParams.edgeBufPx) / (1 + drawParams.endHour - drawParams.startHour);
-	
+	return drawParams;
 }
 
 //drawing stuff
@@ -198,19 +211,28 @@ function translate(r, xi, yi) {
     return new Rectangle(r.x+xi, r.y+yi, r.width, r.height);
 }
 
-function draw(struct) {
-    calculateDefaultParams(struct);
-    canvas = document.getElementById("schc");
+function draw(classes) {
+	var dpar = calculateDefaultParams(classes);
+    
+	var cdiv = document.getElementById("controldiv");
+	var e = dpar.controlDivEdgeBuf;
+	var cdrect = centerRect(new Rectangle(0, 0, dpar.colWidth, dpar.rowHeight), dpar.controlDivEdgeBuf);
+	cdiv.style.width = cdrect.width + "px";
+	cdiv.style.height = cdrect.height + "px";
+	cdiv.style.left = cdrect.x + "px";
+	cdiv.style.top = cdrect.y + "px";
+
+	canvas = document.getElementById("schc");
     c = canvas.getContext('2d');
     c.strokeStyle = "black";
-	c.lineWidth = 2;
-    drawLabels(c, drawParams);
-    c.translate(drawParams.colWidth, drawParams.rowHeight);
-    drawGrid(c, drawParams);
+	c.lineWidth = dpar.lineWidth;
+    drawLabels(c, dpar);
+    c.translate(dpar.colWidth, dpar.rowHeight);
+    drawGrid(c, dpar);
 	
 	c.font = "10pt Sans";
-	for (var i=0;  i <struct.length; i++) {
-		drawClassRects(c, struct[i], drawParams.colors[i], drawParams);
+	for (var i=0;  i <classes.length; i++) {
+		drawClassRects(c, classes[i], dpar.colors[i], dpar);
 	}
 }
 
@@ -222,8 +244,8 @@ function drawClassRects(ctx, cl, color, dpar) {
 			var rect = translate(getTSRect(s.time, dpar), dpar.colWidth * dayOrdinal(d), 0);
 			fillRect(ctx, rect, color);
 			ctx.fillStyle = dpar.textColor;
-			//drawCenteredText(ctx, cl.name+"\n"+cl.title+"\n"+s.building+" "+s.room, rect);
-			drawCenteredText(ctx, cl.name+"\n"+s.building+" "+s.room, rect, dpar);
+			drawCenteredText(ctx, cl.name+"\n"+cl.title+"\n"+s.building+" "+s.room, rect, dpar);
+			//drawCenteredText(ctx, cl.name+"\n"+s.building+" "+s.room, rect, dpar);
 		}
 	}
 }
@@ -250,12 +272,9 @@ function drawLabels(ctx, d) {
 
 //expect the ctx to already have been translated the appropriate amount
 function drawGrid(ctx, d) {
-	console.log("d", d);
     for (var day = 0; day < 5; day++)
-		for (var hour = d.startHour; hour < d.endHour; hour++) {
-			console.log("sH", d.startHour);
+		for (var hour = d.startHour; hour < d.endHour; hour++)
 			ctx.strokeRect(day*d.colWidth, (hour - d.startHour)*d.rowHeight, d.colWidth, d.rowHeight);
-		}
 }
 
 //timespan -> rectangle (x = 0)
@@ -267,9 +286,14 @@ function getTSRect(ts, d) {
 	return new Rectangle(0, topY, d.colWidth, botY - topY);
 }
 
+function centerRect(rect, lineW) {
+	return new Rectangle(rect.x + lineW/2, rect.y + lineW/2, rect.width - lineW, rect.height - lineW);
+}
+
 function fillRect(ctx, rect, color) {
 	ctx.fillStyle = color;
-	ctx.fillRect(rect.x + ctx.lineWidth/2, rect.y + ctx.lineWidth/2, rect.width - ctx.lineWidth, rect.height - ctx.lineWidth);
+	var r = centerRect(rect, ctx.lineWidth);
+	ctx.fillRect(r.x, r.y, r.width, r.height);
 }
 
 function drawCenteredText(ctx, str, rect, d) {
