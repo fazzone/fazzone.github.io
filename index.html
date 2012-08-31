@@ -70,9 +70,10 @@
 		  When you click on the bookmark, you are (in effect) throwing away the protection in your browser against the following attack, known as a 
 		  "cookie-stealing attack" (<a href="https://en.wikipedia.org/wiki/HTTP_cookie#Cross-site_scripting_.E2.80.93_cookie_theft">wikipedia</a>), which works as follows:
 		  <ul>
-			<li>The malicious code accesses your cookie through the variable <code>document.cookie</code></li>
-			<li>Your cookie is then sent to somewhere the attack can later retreive it</li>
-			<li>Now, all the attacker needs to do is set his utexas.edu cookie to yours, and they can impersonate you on that domain</li>
+			<li>An attacker writes malicious Javascript, and somehow tricks you / your browser into running it</li>
+			<li>This code then code accesses your cookie through the variable <code>document.cookie</code></li>
+			<li>Your cookie is then sent to the attacker</li>
+			<li>Now, all the attacker needs to do is set their utexas.edu cookie to yours, and they can impersonate you on that domain</li>
 		  </ul>
 		  (If you want to see the contents of your login cookie, you can do so by typing <code>javascript:alert(document.cookie)</code> into your URL bar
 		  (while on a page from the utexas.edu domain) and pressing enter)
