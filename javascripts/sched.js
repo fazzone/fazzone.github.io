@@ -83,7 +83,8 @@ var dayNames = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 function parseDayAbbrev(str) {
     var sDays = new Array();
     while (str.length > 0)
-		for (var ai=0; ai < dayAbbrevs.length; ai++)
+		//iterate backwards to get Thursday first so we don't eat a T and get stuck in an infinite loop on 'H'
+		for (var ai=dayAbbrevs.length - 1; ai >= 0; ai--)
 			if (str.indexOf(dayAbbrevs[ai]) == 0) {
 				sDays.push(dayNames[ai]);
 				str = str.substring(dayAbbrevs[ai].length);
@@ -141,13 +142,14 @@ function getTableHTML() {
     //decode before substring because otherwise the < gets escaped
     //and we can't find it with substring
     var dd = decodeURIComponent(window.location);
-    return dd.substring(dd.indexOf("<tbody"));
+    return dd.substring(dd.indexOf("<tbody")).replace(/\+/g, ' ');
 }
 
 function readClasses(htmlstr) {
-    //create that DOM so we can walk through it
+    //create that DOM table so we can walk through it
     var tbl = document.createElement("table");
     tbl.innerHTML = htmlstr;
+	
     var rows = tbl.getElementsByTagName("tr");
     var vs = new Array();
     for (var i = 0; i < rows.length; i++) {
@@ -158,7 +160,7 @@ function readClasses(htmlstr) {
     return vs;
 }
 
-var drawingParams = {
+var drawParams = {
     colWidth: 256,	//one day == one col
     rowHeight: 128,	//one hour == one row
     edgeBufPx: 50,
@@ -168,27 +170,27 @@ var drawingParams = {
 	lineSpacing: 18,
 	textColor: "black",
 
-	colors: ["red", "green", "blue", "yellow", "purple"],
-
-    startHour: 7,	//24-hour clock hours
-    endHour: 18		
+	colors: ["red", "green", "blue", "yellow", "purple", "orange", "cyan"]
+//    ,startHour: 6,	//24-hour clock hours
+//    endHour: 20		
 };
 
 function calculateDefaultParams(struct) {
-    //1 + the actual value here because we need the extra row/col for the grid labels
-    drawingParams.colWidth = (window.innerWidth - drawingParams.edgeBufPx) / (1 + 5);
-    drawingParams.rowHeight = (window.innerHeight - drawingParams.edgeBufPx) / (1 + drawingParams.endHour - drawingParams.startHour);
-	//let's construct the viewing window so that we have some buffer on each size
+    //let's construct the viewing window so that we have some buffer on each size
 	
 	var minH = 25, maxH = -1;
 	for (var i = 0; i < struct.length; i++)
 		for (var j = 0; j < struct[i].sessions.length; j++) {
 			minH = Math.min(getHours24(struct[i].sessions[j].time.begin), minH);
 			maxH = Math.max(getHours24(struct[i].sessions[j].time.end), maxH);
-							
 		}
-	drawingParams.startHour = minH - 1;
-	drawingParams.endHour = maxH + 1;
+	drawParams.startHour = minH - 1;
+	drawParams.endHour = maxH + 1;
+
+	//1 + the actual value here because we need the extra row/col for the grid labels
+    drawParams.colWidth = (window.innerWidth - drawParams.edgeBufPx) / (1 + 5);
+    drawParams.rowHeight = (window.innerHeight - drawParams.edgeBufPx) / (1 + drawParams.endHour - drawParams.startHour);
+	
 }
 
 //drawing stuff
@@ -202,34 +204,31 @@ function draw(struct) {
     c = canvas.getContext('2d');
     c.strokeStyle = "black";
 	c.lineWidth = 2;
-    drawLabels(c);
-    c.translate(drawingParams.colWidth, drawingParams.rowHeight);
-    drawGrid(c);
+    drawLabels(c, drawParams);
+    c.translate(drawParams.colWidth, drawParams.rowHeight);
+    drawGrid(c, drawParams);
 	
 	c.font = "10pt Sans";
 	for (var i=0;  i <struct.length; i++) {
-		drawClassRects(c, struct[i], drawingParams.colors[i]);
+		drawClassRects(c, struct[i], drawParams.colors[i], drawParams);
 	}
 }
 
-function drawClassRects(ctx, cl, color) {
-	console.log(color, cl);
+function drawClassRects(ctx, cl, color, dpar) {
 	for (var i = 0; i < cl.sessions.length; i++) {
 		var s = cl.sessions[i];
 		for (var j = 0; j < s.days.length; j++) {
 			var d = s.days[j];
-			var rect = translate(getTSRect(s.time), drawingParams.colWidth * dayOrdinal(d), 0);
-			console.log(rect);
+			var rect = translate(getTSRect(s.time, dpar), dpar.colWidth * dayOrdinal(d), 0);
 			fillRect(ctx, rect, color);
-			ctx.fillStyle = drawingParams.textColor;
+			ctx.fillStyle = dpar.textColor;
 			//drawCenteredText(ctx, cl.name+"\n"+cl.title+"\n"+s.building+" "+s.room, rect);
-			drawCenteredText(ctx, cl.name+"\n"+s.building+" "+s.room, rect);
+			drawCenteredText(ctx, cl.name+"\n"+s.building+" "+s.room, rect, dpar);
 		}
 	}
 }
 
-function drawLabels(ctx) {
-    var d = drawingParams;
+function drawLabels(ctx, d) {
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.font = d.textFont;
@@ -237,7 +236,6 @@ function drawLabels(ctx) {
     function hourSpanAt(h) {
 		return new Timespan(createTime24(h, 0), createTime24(1+h, 0));
     }
-    
     for (var day = 0; day < 5; day++) {
 		var baseX = (day+1)*d.colWidth;
 		ctx.strokeRect(baseX, 0, d.colWidth, d.rowHeight);	
@@ -251,21 +249,21 @@ function drawLabels(ctx) {
 }
 
 //expect the ctx to already have been translated the appropriate amount
-function drawGrid(ctx) {
-    var d = drawingParams;
+function drawGrid(ctx, d) {
+	console.log("d", d);
     for (var day = 0; day < 5; day++)
-		for (var hour = d.startHour; hour < d.endHour; hour++)
+		for (var hour = d.startHour; hour < d.endHour; hour++) {
+			console.log("sH", d.startHour);
 			ctx.strokeRect(day*d.colWidth, (hour - d.startHour)*d.rowHeight, d.colWidth, d.rowHeight);
+		}
 }
 
 //timespan -> rectangle (x = 0)
-function getTSRect(ts) {
-	var d = drawingParams;
+function getTSRect(ts, d) {
 	function timeToPixels(t) {
 		return ((getHours24(t) - d.startHour) + t.minutes / 60) * d.rowHeight;
 	}
 	var topY = timeToPixels(ts.begin), botY = timeToPixels(ts.end);
-	console.log("topy, boty ", topY, botY);
 	return new Rectangle(0, topY, d.colWidth, botY - topY);
 }
 
@@ -274,13 +272,13 @@ function fillRect(ctx, rect, color) {
 	ctx.fillRect(rect.x + ctx.lineWidth/2, rect.y + ctx.lineWidth/2, rect.width - ctx.lineWidth, rect.height - ctx.lineWidth);
 }
 
-function drawCenteredText(ctx, str, rect) {
+function drawCenteredText(ctx, str, rect, d) {
 	var lines = str.split("\n"), nLines = lines.length;
 	var base  = rect.y + rect.height / 2;
 	var centerLineIdx = nLines / 2;
 	centerLineIdx = (nLines % 2 == 0) ? centerLineIdx - 1/2 : Math.floor(centerLineIdx);
 
-	var spacing = drawingParams.lineSpacing;
+	var spacing = d.lineSpacing;
 	for (var i = 0; i<nLines; i++) {
 		ctx.fillText(lines[i], rect.x + rect.width/2, spacing*(i - centerLineIdx) + base);
 	}
