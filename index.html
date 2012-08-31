@@ -27,9 +27,85 @@
     <!-- MAIN CONTENT -->
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
-        <a href="javascript:(window.location = 'http://fazzone.github.com/schedule.html?q=' + document.getElementsByTagName('table')[0].innerHTML.replace(/\n/gm,'').replace(/\s+/gm, ' ').replace(/ href...*?\>/g, '>'))">
-			Bookmarklet
-		</a>
+        
+		<h3>overview</h3>
+		<p>
+		  This is an automated generator of nice graphical schedules for UT Austin students.  <strong>Note: This process involves running untrusted scripts on a page
+		  that contains sensitive information.</strong>  I assure you that I am not stealing your information or doing anything else otherwise malicious, but if you
+		  would like to make an informed decision instead of just taking my word for it, please read the "note on security" below.
+		</p>
+		<h3>how to use</h3>
+		<p>
+		  <ol>
+			<li>Drag this link to your bookmarks bar:
+			  <a href="javascript:(window.location = 'http://fazzone.github.com/schedule.html?q=' + document.getElementsByTagName('table')[0].innerHTML.replace(/\n/gm,'').replace(/\s+/gm, ' ').replace(/ href...*?\>/g, '>'))">
+				generate schedule
+			  </a>
+			</li>
+			<li>
+			  Go to the "Current Course Schedule" page of UT Direct: <a href="https://utdirect.utexas.edu/registration/classlist.WBX"> link </a>
+			</li>
+			<li>
+			  Click the bookmark that you just made -- you should be redirected to a nice graphical representation of your schedule.
+			</li>
+		  </ol>
+		</p>
+		
+		<h3>note on security</h3>
+		<div style="padding-left: 20px">
+		<h4>javascript, cookies, and the same-origin policy</h4>
+		<p>
+		  The above link/bookmarklet contains Javascript code that is executed by your browser when you click on it.  Modern browsers, in an attempt to foil
+		  cross-site-scripting (XSS) attacks, implement a "<a href="https://en.wikipedia.org/wiki/Same_origin_policy">same-origin policy</a>" on scripts - 
+		  essentially, only scripts that come from the same source can share (potentially sensitive) information.  However, when you type javascript into
+		  the URL bar (what is effectively happening when you click the bookmark, the browser assumes that you know what you are doing and lets your script
+		  fragment access all the information that scripts from the same origin as the webpage can.  Cookies, persistent bits of site-specific data manipulated
+		  by scripts, are one of the things that fall under the heading of "information" in the same-origin policy.  Many sites (including UT Direct, I believe)
+		  use cookies to store login information -- this is what allows you to remain logged in even while your UT Direct tab (or even your browser) is closed,
+		  so that you needn't re-type your password when you open the page up again.  Essentially, once you type your password in once, the login cookie
+		  identifies you (for a certain time) -- so anyone else, as long as they had your login cookie, could impersonate you.
+		</p>
+		<h4>a cookie-stealing attack</h4>
+		<p>
+		  When you click on the bookmark, you are (in effect) throwing away the protection in your browser against the following attack, known as a 
+		  "cookie-stealing attack" (<a href="https://en.wikipedia.org/wiki/HTTP_cookie#Cross-site_scripting_.E2.80.93_cookie_theft">wikipedia</a>), which works as follows:
+		  <ul>
+			<li>The malicious code accesses your cookie through the variable <code>document.cookie</code></li>
+			<li>Your cookie is then sent to somewhere the attack can later retreive it</li>
+			<li>Now, all the attacker needs to do is set his utexas.edu cookie to yours, and they can impersonate you on that domain</li>
+		  </ul>
+		  (If you want to see the contents of your login cookie, you can do so by typing <code>javascript:alert(document.cookie)</code> into your URL bar
+		  (while on a page from the utexas.edu domain) and pressing enter)
+		  In order to check that such an attack is not being performed, it is sufficient to read only the Javascript code in the bookmarklet - because
+		  it is only this code that runs with access to information belonging to the utexas.edu domain.  In order to be absolutely sure, you should check
+		  the actual link above, but the same code is reproduced here in more readable form: (// means the rest of the line as a comment)
+		  <code>
+			<pre>
+javascript:(	//Tell the browser to interpret the rest of the "URL" as Javascript to execute
+	window.location = //Go to the URL we're about to build
+		'http://fazzone.github.com/schedule.html?q=' //the URL of the schedule page. ? means the rest of the URL represents parameters
+			+ document.getElementsByTagName('table')[0] //Get all the &lt;table&gt;s on the page, and select the schedule table (the first one; index 0)
+			.innerHTML //ask for the HTML code inside this table
+			.replace(/\n/gm,'').replace(/\s+/gm, ' ').replace(/ href...*?\>/g, '>')) //Remove unnecessary bits from the HTML
+		  </pre>
+		  </code>
+		</p>
+
+		</div>
+		
+		<h3>if it doesn't work</h3>
+		<p>
+		  This has only been tested on a fairly small sample of schedules, so it's quite likely there are a multitude of bugs.  I would expect it to work in
+		  current versions of Chrome and Firefox, but I do not have much hope for even current versions of Internet Explorer.  If you encounted a bug, or you 
+		  believe the output is incorrect (not consistent with your schedule as described by the table in the "Current Course Schedule" page, please copy the
+		  contents of your URL bar and send it to me an email at rmcq@utexas.edu.
+		</p>
+
+		<h3>technical notes - overview</h3>
+		<p>
+		  coming soon
+		</p>
+		
       </section>
     </div>
 
