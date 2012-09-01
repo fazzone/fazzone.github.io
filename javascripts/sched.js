@@ -56,6 +56,7 @@ function parseTime(str) {
     //Have to include the radix in the second parseInt because if we don't,
     //and try to parse something like "9:09am", it tries to parse "09" as
     //octal because of the leading zero -- and returns zero (not what we want)
+
     return new Time(parseInt(t[1]), parseInt(t[2], 10), (t[3] == "pm"));
 }
 
@@ -108,7 +109,8 @@ function entityDecode(str) {
 }
 
 
-//pass in a <tr> DOM object; get an array of Session objects
+//pass in a <tr> DOM object; get an array of Session objects (or null, if the <tr>
+//element passed in does not describe a valid class)
 function parseClass(tr) {
     var cells = tr.getElementsByTagName("td");
     if (cells.length < 7)
@@ -144,8 +146,18 @@ function parseClass(tr) {
     var days      = cells[5].innerHTML.split("<br>").map(nmTrim);
     var times     = cells[6].innerHTML.split("<br>").map(nmTrim);
     
-    var sessions = new Array(Math.min(buildings.length, rooms.length, days.length, times.length));
-    for (var s = 0; s < sessions.length; s++)
+	//before we go further, we'll do a quick check that we have at least something
+	//for each field (I have seen schedules with rows that have empty cells, so this
+	//is necessary to make the script not break in that case)
+	var fields = [buildings, rooms, days, times];
+	var minLen = 1024;
+	for (var i in fields)
+		if (fields[i].length < 1 || fields[i][0].length == 0)
+			return null;
+		else minLen = Math.min(minLen, fields[i].length);
+		
+    var sessions = new Array(minLen);
+    for (var s=0; s < minLen; s++)
 		sessions[s] = new Session(buildings[s], rooms[s], parseDayAbbrev(days[s]), parseTimespan(times[s]));
     return new Class(course, title, sessions);
 }
@@ -187,7 +199,7 @@ function calculateDefaultParams(classes) {
 		lineSpacing: 18,
 		textColor: "black",
 		
-		colors: ["red", "green", "blue", "yellow", "purple", "orange", "cyan"]
+		colors: ["rgb(0,191,255)", "green", "yellow", "rgb(205,85,0)", "rgb(218,112,214)"]
 	};
 	
 	//let's conclasses the viewing window so that we have some buffer on each size	
