@@ -15,7 +15,7 @@ function calculateDefaultParams(classes) {
 		lineSpacing: 18,
 		textColor: "black",
 		
-		colors: ["rgb(0,191,255)", "green", "yellow", "rgb(205,85,0)", "rgb(218,112,214)"]
+		colors: ["rgb(0,191,255)", "green", "yellow", "rgb(205,85,0)", "rgb(218,112,214)", "red"]
 	};
 	
 	//let's conclasses the viewing window so that we have some buffer on each size	
