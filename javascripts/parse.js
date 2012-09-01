@@ -1,3 +1,5 @@
+//parse.js - the code that parses the UT Direct table into an object/structure lives here
+
 //objects/ctors, top-down
 function Class(name, title, ss) {
     this.name = name;

@@ -1,3 +1,4 @@
+//draw.js - all drawing/canvas-related code goes here
 
 function calculateDefaultParams(classes) {
     //defaults
@@ -33,7 +34,6 @@ function calculateDefaultParams(classes) {
 	return drawParams;
 }
 
-//drawing stuff
 function translate(r, xi, yi) {
     return new Rectangle(r.x+xi, r.y+yi, r.width, r.height);
 }
