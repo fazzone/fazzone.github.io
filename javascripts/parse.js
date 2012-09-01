@@ -30,7 +30,7 @@ function createTime24(h, m) {
     if (h == 0)
 		return new Time(12, m, false);
     var pm = h >= 12;
-    if (pm & h > 12)
+    if (pm && h > 12)
 		h -= 12;
     
     return new Time(h, m, pm);
@@ -69,14 +69,14 @@ function showTime(t) {
     return t.hours + ":" + zeroPad(t.minutes) + (t.isPM ? "pm" : "am");
 }
 
-function showTimespan(t) {
-    return showTime(t.begin) + " - " + showTime(t.end);
-}
-
-//timespans look like "1:00pm- 2:00pm"
+//now timespans - "1:00pm- 2:00pm" and the like
 function parseTimespan(str) {
     var times = str.split("-").map(parseTime);
     return new Timespan(times[0], times[1]);
+}
+
+function showTimespan(t) {
+    return showTime(t.begin) + " - " + showTime(t.end);
 }
 
 var dayAbbrevs = ["M", "T", "W", "TH", "F"];
@@ -95,21 +95,22 @@ function parseDayAbbrev(str) {
     return sDays;
 }
 
+//used in draw.js
 function dayOrdinal(d) {
 	return dayNames.indexOf(d);
 }
 
-//misc
-/*A huge security hole -- it would allow the admins of UT Direct (unlikely) to
-sneak Javascript code (in <script> tags or whatever) into the schedule-table (unlikely) 
-which could then be used to steal our data or something -- all of which comes from them,
-so I see no reason to make this function "secure" */
+//Some class names have ampersands and such in them -- since we're parsing HTML, they are (properly)
+//encoded as entites, so we have to decode them.  I suppose this naivete of this function constitutes
+//a huge security hole: it would allow the admins of UT Direct (unlikely) to
+//sneak Javascript code (in <script> tags or whatever) into the schedule-table (unlikely) 
+//which could then be used to steal our data or something -- all of which comes from them,
+//so I see no reason to make this function "secure"
 function entityDecode(str) {
 	var div = document.createElement('div');
 	div.innerHTML = str;
 	return div.textContent;
 }
-
 
 //pass in a <tr> DOM object; get an array of Session objects (or null, if the <tr>
 //element passed in does not describe a valid class)
@@ -121,7 +122,8 @@ function parseClass(tr) {
     var uniqueID = cells[0].innerHTML.trim();
     var course   = cells[1].innerHTML.trim();
     var title    = entityDecode(cells[2].innerHTML.trim());	//for &amp;s and the like
-    //Now things get tricky.  When a class has multiple locations,times etc
+    
+	//Now things get tricky.  When a class has multiple locations,times etc
     //UTDirect gives up a table with <br>s in the <td>s -- so we'll have to
     //read those and do a sort of transpose to get what we want.
     
@@ -152,14 +154,15 @@ function parseClass(tr) {
 	//for each field (I have seen schedules with rows that have empty cells, so this
 	//is necessary to make the script not break in that case)
 	var fields = [buildings, rooms, days, times];
-	var minLen = 1024;
+	//so long as we're iterating, we might as well calculate how many sessions there are
+	var nSessions = 1024;
 	for (var i in fields)
 		if (fields[i].length < 1 || fields[i][0].length == 0)
 			return null;
-		else minLen = Math.min(minLen, fields[i].length);
+		else nSessions = Math.min(nSessions, fields[i].length);
 		
-    var sessions = new Array(minLen);
-    for (var s=0; s < minLen; s++)
+    var sessions = new Array(nSessions);
+    for (var s=0; s < nSessions; s++)
 		sessions[s] = new Session(buildings[s], rooms[s], parseDayAbbrev(days[s]), parseTimespan(times[s]));
     return new Class(course, title, sessions);
 }
@@ -172,7 +175,7 @@ function getTableHTML() {
 }
 
 function readClasses(htmlstr) {
-    //create that DOM table so we can walk through it
+    //create a DOM table so we can walk through it
     var tbl = document.createElement("table");
     tbl.innerHTML = htmlstr;
 	
