@@ -15,10 +15,10 @@ function calculateDefaultParams(classes) {
 		lineSpacing: 18,
 		textColor: "black",
 		
-		colors: ["rgb(0,191,255)", "green", "yellow", "rgb(205,85,0)", "rgb(218,112,214)", "red", "purple", "blue"]
+//		colors: ["rgb(0,191,255)", "green", "yellow", "rgb(205,85,0)", "rgb(218,112,214)", "red", "purple", "blue"]
 	};
 	
-	//let's conclasses the viewing window so that we have some buffer on each size	
+	//let's construct the viewing window so that we have some buffer on each size	
 	var minH = 25, maxH = -1;
 	for (var i = 0; i < classes.length; i++)
 		for (var j = 0; j < classes[i].sessions.length; j++) {
@@ -31,6 +31,10 @@ function calculateDefaultParams(classes) {
 	//1 + the actual value here because we need the extra row/col for the grid labels
     drawParams.colWidth = (window.innerWidth - drawParams.edgeBufPx) / (1 + 5);
     drawParams.rowHeight = (window.innerHeight - drawParams.edgeBufPx) / (1 + drawParams.endHour - drawParams.startHour);
+
+	//calculate an evenly-distributed color scheme -- see color.js
+	drawParams.colors = getSubdivColors(classes.length, 0.5, 0.9);
+
 	return drawParams;
 }
 
