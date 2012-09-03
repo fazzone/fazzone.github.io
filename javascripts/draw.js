@@ -14,8 +14,6 @@ function calculateDefaultParams(classes) {
 		textFont: "16pt Sans",
 		lineSpacing: 18,
 		textColor: "black",
-		
-//		colors: ["rgb(0,191,255)", "green", "yellow", "rgb(205,85,0)", "rgb(218,112,214)", "red", "purple", "blue"]
 	};
 	
 	//let's construct the viewing window so that we have some buffer on each size	
@@ -62,9 +60,8 @@ function draw(classes) {
     drawGrid(c, dpar);
 	
 	c.font = "10pt Sans";
-	for (var i=0;  i <classes.length; i++) {
+	for (var i=0;  i <classes.length; i++)
 		drawClassRects(c, classes[i], dpar.colors[i], dpar);
-	}
 }
 
 function drawClassRects(ctx, cl, color, dpar) {
@@ -76,7 +73,6 @@ function drawClassRects(ctx, cl, color, dpar) {
 			fillRect(ctx, rect, color);
 			ctx.fillStyle = dpar.textColor;
 			drawCenteredText(ctx, cl.name+"\n"+cl.title+"\n"+s.building+" "+s.room, rect, dpar);
-			//drawCenteredText(ctx, cl.name+"\n"+s.building+" "+s.room, rect, dpar);
 		}
 	}
 }
@@ -134,7 +130,6 @@ function drawCenteredText(ctx, str, rect, d) {
 	centerLineIdx = (nLines % 2 == 0) ? centerLineIdx - 1/2 : Math.floor(centerLineIdx);
 
 	var spacing = d.lineSpacing;
-	for (var i = 0; i<nLines; i++) {
+	for (var i = 0; i<nLines; i++)
 		ctx.fillText(lines[i], rect.x + rect.width/2, spacing*(i - centerLineIdx) + base);
-	}
 }
