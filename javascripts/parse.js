@@ -150,16 +150,24 @@ function parseClass(tr) {
     var days      = cells[5].innerHTML.split("<br>").map(nmTrim);
     var times     = cells[6].innerHTML.split("<br>").map(nmTrim);
     
-	//before we go further, we'll do a quick check that we have at least something
-	//for each field (I have seen schedules with rows that have empty cells, so this
-	//is necessary to make the script not break in that case)
+	function emptyField(d) {
+		return d.length < 1 || d[0].length == 0;
+	}
+	//various schedules have various empty cells, we want to be as liberal as possible
+	//in what we accept, so the bare minimum cells required are days and times.
+	//fail early if we absolutely can't go on
+	if (emptyField(days) || emptyField(times))
+		return null;
+	
 	var fields = [buildings, rooms, days, times];
-	//so long as we're iterating, we might as well calculate how many sessions there are
+	//go through all the fields, if it's empty we'll just set it to a bunch of empty
+	//strings (a huge hack) so we don't fail later when indexing into it
+	//and so long as we're iterating, we might as well calculate how many sessions there are
 	var nSessions = 1024;
 	for (var i in fields)
-		if (fields[i].length < 1 || fields[i][0].length == 0)
-			return null;
-		else nSessions = Math.min(nSessions, fields[i].length);
+		if (emptyField(fields[i]))
+			fields[i] = ["","","","","","","",""]
+		nSessions = Math.min(nSessions, fields[i].length);
 		
     var sessions = new Array(nSessions);
     for (var s=0; s < nSessions; s++)
