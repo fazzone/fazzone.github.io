@@ -6,6 +6,7 @@ function calculateDefaultParams(classes) {
 		colWidth: 256,	//one day == one col
 		rowHeight: 128,	//one hour == one row
 		edgeBufPx: 50,
+		textEdgeBuf: 5,
 		
 		lineWidth: 2,
 		
@@ -88,12 +89,12 @@ function drawLabels(ctx, d) {
     for (var day = 0; day < 5; day++) {
 		var baseX = (day+1)*d.colWidth;
 		ctx.strokeRect(baseX, 0, d.colWidth, d.rowHeight);	
-		ctx.fillText(dayNames[day], baseX + d.colWidth/2, d.rowHeight/2);
+		ctx.fillText(dayNames[day], baseX + d.colWidth/2, d.rowHeight/2, d.colWidth - d.textEdgeBuf);
     }
     for (var hour = d.startHour; hour < d.endHour; hour++) {
 		var baseY = (1 + hour-d.startHour)*d.rowHeight;
 		ctx.strokeRect(0, baseY, d.colWidth, d.rowHeight);
-		ctx.fillText(showTimespan(hourSpanAt(hour)), d.colWidth/2, baseY + d.rowHeight/2);
+		ctx.fillText(showTimespan(hourSpanAt(hour)), d.colWidth/2, baseY + d.rowHeight/2, d.colWidth - d.textEdgeBuf);
     }
 }
 
@@ -131,5 +132,5 @@ function drawCenteredText(ctx, str, rect, d) {
 
 	var spacing = d.lineSpacing;
 	for (var i = 0; i<nLines; i++)
-		ctx.fillText(lines[i], rect.x + rect.width/2, spacing*(i - centerLineIdx) + base);
+		ctx.fillText(lines[i], rect.x + rect.width/2, spacing*(i - centerLineIdx) + base, rect.width - d.textEdgeBuf);
 }
