@@ -21,7 +21,6 @@ function getSubdivColors(n, s, v) {
 	var cs = new Array();
 	for (var theta = 0; theta < 360; theta += inc)
 		cs.push(colorString(toRGB(theta, s, v)));
-	console.log(cs);
 	return cs;
 }
 //copied from http://yui.yahooapis.com/2.9.0/build/colorpicker/colorpicker.js

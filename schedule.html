@@ -12,14 +12,12 @@
   
 <body onload="draw(readClasses(getTableHTML()))">
 
-  <canvas style="position: absolute; left:0px; top:0px;" id="schc" width="1900" height="1100">
+  <canvas style="position: absolute; left:0px; top:0px;" id="schc">
 	lol canvases
   </canvas>
 
-  <div id="controldiv" style="position: absolute; left: 0px; top: 0px; width:200px; height:100px; background-color: yellow;">
+  <div id="controldiv" style="position: absolute; left: 0px; top: 0px;">
 	<center>
-	  controls:
-	  <br>
 	  <button onclick="window.location.href = document.getElementById('schc').toDataURL()">convert to PNG</button>
 	  <br>
 	  <button onclick="shortenURL()">shorten URL</button>

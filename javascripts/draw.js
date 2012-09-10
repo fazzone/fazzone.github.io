@@ -1,5 +1,12 @@
 //draw.js - all drawing/canvas-related code goes here
 
+function sizeCanvas() {
+	var canvas = document.getElementById("schc");
+	canvas.width = window.innerWidth;
+	canvas.height = window.innerHeight;
+	console.log(canvas);
+}
+
 function calculateDefaultParams(classes) {
 	//defaults
 	var drawParams = {
@@ -42,18 +49,18 @@ function translate(r, xi, yi) {
 }
 
 function draw(classes) {
+	sizeCanvas();
 	var dpar = calculateDefaultParams(classes);
 	
 	var cdiv = document.getElementById("controldiv");
-	var e = dpar.controlDivEdgeBuf;
 	var cdrect = centerRect(new Rectangle(0, 0, dpar.colWidth, dpar.rowHeight), dpar.controlDivEdgeBuf);
 	cdiv.style.width = cdrect.width + "px";
 	cdiv.style.height = cdrect.height + "px";
 	cdiv.style.left = cdrect.x + "px";
 	cdiv.style.top = cdrect.y + "px";
 	
-	canvas = document.getElementById("schc");
-	c = canvas.getContext('2d');
+	var canvas = document.getElementById("schc");
+	var c = canvas.getContext('2d');
 	c.strokeStyle = "black";
 	c.lineWidth = dpar.lineWidth;
 	drawLabels(c, dpar);
