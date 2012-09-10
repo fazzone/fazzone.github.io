@@ -9,9 +9,21 @@
     <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
 
     <title>UT Austin schedule generator</title>
+
+	<script type="text/javascript">
+	  function writeBookmarkInstructions() {
+	  		var sp = document.getElementById("bmarkinstr");
+	    	if (navigator.userAgent.search("Chrome") > 0) {
+	  			sp.innerHTML = "Drag this link to your bookmarks bar (Ctrl-Shift-B to show it):";
+	  		} else if (navigator.userAgent.search("Firefox") > 0) {
+				sp.innerHTML = "Bookmark this link (right click):";
+			} else sp.innerHTML = "Book mark this link";
+	  			
+	  }
+	</script>
   </head>
 
-  <body>
+  <body onload="writeBookmarkInstructions()">
 
     <!-- HEADER -->
     <div id="header_wrap" class="outer">
@@ -63,7 +75,7 @@
 		<h3 id="usage">how to use</h3>
 		<p>
 		  <ol>
-			<li>Drag this link to your bookmarks bar:
+			<li><span id="bmarkinstr">Bookmark this link:</span>
 			  <a href="javascript:(window.location = 'http://fazzone.github.com/schedule.html?q=' + document.getElementsByTagName('table')[0].innerHTML.replace(/\n/gm,'').replace(/\s+/gm, ' ').replace(/ href...*?\>/g, '>'))">
 				generate schedule
 			  </a>
