@@ -4,7 +4,6 @@ function sizeCanvas() {
 	var canvas = document.getElementById("schc");
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
-	console.log(canvas);
 }
 
 function estimateTextFont(cHeight) {
