@@ -7,6 +7,14 @@ function sizeCanvas() {
 	console.log(canvas);
 }
 
+function estimateTextFont(cHeight) {
+	if (cHeight > 770)
+		return 12;
+	if (cHeight > 644)
+		return 10;
+	return 8;
+}
+
 function calculateDefaultParams(classes) {
 	//defaults
 	var drawParams = {
@@ -19,7 +27,8 @@ function calculateDefaultParams(classes) {
 		
 		controlDivEdgeBuf: 10,
 		
-		textFont: "16pt Sans",
+		labelFont: "20pt Sans",
+		textFont: "10pt Sans",
 		lineSpacing: 18,
 		textColor: "black",
 	};
@@ -41,6 +50,10 @@ function calculateDefaultParams(classes) {
 	//calculate an evenly-distributed color scheme -- see color.js
 	drawParams.colors = getSubdivColors(classes.length, 0.5, 0.9);
 	
+	//Canvas can stretch our text horizontally but we have to estimate the right size so that it doesn't get
+	//squished vertically
+	drawParams.textFont = estimateTextFont(window.innerHeight) + "pt Sans";
+
 	return drawParams;
 }
 
@@ -67,7 +80,7 @@ function draw(classes) {
 	c.translate(dpar.colWidth, dpar.rowHeight);
 	drawGrid(c, dpar);
 	
-	c.font = "10pt Sans";
+	c.font = dpar.textFont;
 	for (var i=0;  i <classes.length; i++)
 		drawClassRects(c, classes[i], dpar.colors[i], dpar);
 }
@@ -88,7 +101,7 @@ function drawClassRects(ctx, cl, color, dpar) {
 function drawLabels(ctx, d) {
 	ctx.textAlign = "center";
 	ctx.textBaseline = "middle";
-	ctx.font = d.textFont;
+	ctx.font = d.labelFont;
 	
 	function hourSpanAt(h) {
 		return new Timespan(createTime24(h, 0), createTime24(1+h, 0));
