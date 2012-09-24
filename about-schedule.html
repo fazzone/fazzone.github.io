@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="UT Austin schedule generator : Generate nice schedule graphics!" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>UT Austin schedule generator</title>
+
+	<script type="text/javascript">
+	  function writeBookmarkInstructions() {
+	  		var sp = document.getElementById("bmarkinstr");
+	    	if (navigator.userAgent.search("Chrome") > 0) {
+	  			sp.innerHTML = "Drag this link to your bookmarks bar (Ctrl-Shift-B to show it):";
+	  		} else if (navigator.userAgent.search("Firefox") > 0) {
+				sp.innerHTML = "Bookmark this link (right click):";
+			} else sp.innerHTML = "Book mark this link";
+	  			
+	  }
+	</script>
+  </head>
+
+  <body onload="writeBookmarkInstructions()">
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/fazzone/fazzone.github.com">View on GitHub</a>
+
+          <h1 id="project_title">UT Austin schedule generator</h1>
+          <h2 id="project_tagline">Generate nice schedule graphics!</h2>
+
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        
+		<div style="background-color: rgb(230,230,230);">
+		  <h3>contents</h3>
+		  <ol>
+			<li><a href="#overview">overview</a></li>
+			<li><a href="#usage">how to use</a></li>
+			
+			<li>
+			  <a href="#security">note on security</a>
+			  <ul>
+				<li><a href="#xss">javascript, cookies, and the same-origin policy</a></li>
+				<li><a href="#cookiestealing">a cookie-stealing attack</a></li>
+			  </ul>
+			</li>
+			
+			<li><a href="#problems">if it doesn't work</a></li>
+			
+			<li>
+			  <a href="#programmers">for the programmers in the audience</a>
+			  <ul>
+				<li><a href="#implementation">implementation notes</a></li>
+				<li><a href="#hacking">hacking</a></li>
+			  </ul>
+			</li>
+		  </ol>
+		</div>
+		
+		<h3 id="overview">overview</h3>
+		<p>
+		  This is an automated generator of nice graphical schedules for UT Austin students.  <strong>Note: This process involves running untrusted scripts on a page
+		  that contains sensitive information.</strong>  I assure you that I am not stealing your information or doing anything  malicious, but if you
+		  would like to make an informed decision instead of just taking my word for it, please read the <a href="#security">note on security</a> below.
+		</p>
+		<h3 id="usage">how to use</h3>
+		<p>
+		  <ol>
+			<li><span id="bmarkinstr">Bookmark this link:</span>
+			  <a href="javascript:(window.location = 'http://fazzone.github.com/schedule.html?q=' + document.getElementsByTagName('table')[0].innerHTML.replace(/\n/gm,'').replace(/\s+/gm, ' ').replace(/ href...*?\>/g, '>'))">
+				generate schedule
+			  </a>
+			</li>
+			<li>
+			  Go to the "<a href="https://utdirect.utexas.edu/registration/classlist.WBX">Current Course Schedule</a>" page of UT Direct
+			</li>
+			<li>
+			  Click the bookmark that you just made -- you should be redirected to a nice graphical representation of your schedule.
+			</li>
+		  </ol>
+		</p>
+		
+		<h3 id="security">note on security</h3>
+		<div style="padding-left: 20px">
+		<h4 id="xss">javascript, cookies, and the same-origin policy</h4>
+		<p>
+		  The above link/bookmarklet contains Javascript code that is executed by your browser when you click on it.  Modern browsers, in an attempt to foil
+		  cross-site-scripting (XSS) attacks, implement a "same-origin policy" (<a href="https://en.wikipedia.org/wiki/Same_origin_policy">wikipedia</a>) for scripts - 
+		  essentially, only scripts that come from the same source can share (potentially sensitive) information.  However, when you type javascript into
+		  the URL bar (what is effectively happening when you click the bookmark), the browser assumes that you know what you are doing and lets your script
+		  fragment access all the information that scripts from the same origin as the webpage can.  Cookies, persistent bits of site-specific data manipulated
+		  by scripts, are one of the things that fall under the heading of "information" in the same-origin policy.  Many sites (including UT Direct, I believe)
+		  use cookies to store login information -- this is what allows you to remain logged in even while your UT Direct tab (or even your browser) is closed,
+		  so that you needn't re-type your password when you open the page up again.  Essentially, once you type your password in once, the login cookie
+		  identifies you (for a certain time) -- so anyone else, as long as they had your login cookie, could impersonate you.
+		</p>
+		<h4 id="cookiestealing">a cookie-stealing attack</h4>
+		<p>
+		  When you click on the bookmark, you are (in effect) throwing away the protection in your browser against the following attack, known as a 
+		  "cookie-stealing attack" (<a href="https://en.wikipedia.org/wiki/HTTP_cookie#Cross-site_scripting_.E2.80.93_cookie_theft">wikipedia</a>), which works as follows:
+		  <ul>
+			<li>An attacker writes malicious Javascript, and somehow tricks you / your browser into running it</li>
+			<li>This code then code accesses your cookie through the variable <code>document.cookie</code></li>
+			<li>Your cookie is then sent to the attacker</li>
+			<li>Now, all the attacker needs to do is set their utexas.edu cookie to yours, and they can impersonate you on that domain</li>
+		  </ul>
+		  (If you want to see the contents of your login cookie, you can do so by typing <code>javascript:alert(document.cookie)</code> into your URL bar
+		  (while on a page from the utexas.edu domain) and press enter)
+		  In order to check that such an attack is not being performed, it is sufficient to read only the Javascript code in the bookmarklet - because
+		  it is only this code that runs with access to information belonging to the utexas.edu domain.  In order to be absolutely sure, you should check
+		  the actual link above, but the same code is reproduced here in more readable form: (// means the rest of the line as a comment)
+		  <code>
+			<pre>
+javascript:(	//Tell the browser to interpret the rest of the "URL" as Javascript to execute
+	window.location = //Go to the URL we're about to build
+		'http://fazzone.github.com/schedule.html?q=' //the URL of the schedule page. ? means the rest of the URL represents parameters
+			+ document.getElementsByTagName('table')[0] //Get all the &lt;table&gt;s on the page, and select the schedule table (the first one; index 0)
+			.innerHTML //ask for the HTML code inside this table
+			.replace(/\n/gm,'').replace(/\s+/gm, ' ').replace(/ href...*?\>/g, '>')) //Remove unnecessary bits from the HTML
+		  </pre>
+		  </code>
+		</p>
+
+		</div>
+		
+		<h3 id="problems">if it doesn't work</h3>
+		<p>
+		  This has only been tested on a fairly small sample of schedules, so it's quite likely there are a multitude of bugs.  I would expect it to work in
+		  current versions of Chrome and Firefox, but I do not have much hope for even current versions of Internet Explorer.  If you encounted a bug, or you 
+		  believe the output is incorrect (not consistent with your schedule as described by the table in the "Current Course Schedule" page), please copy the
+		  contents of your URL bar and send it to me at rmcq@utexas.edu.
+		</p>
+
+		<h3 id="programmers">for the programmers in the audience</h3>
+		<div style="padding-left:20px">
+		  <h4 id="implementation">implemtation notes</h4>
+		  <div style="padding-left:20px">
+			This program consists of two parts:
+			<ul>
+			  <li>The bookmarklet code, which extracts the HTML code of your schedule-table</li>
+			  <li>The actual parsing and rendering logic, which does everything else</li>
+		  </ul>
+			So you run the bookmarklet code on the schedule page, and it takes the table HTML and basically pastes it (after some regex replacements to eliminate
+			unnecessary information) on the end of a URL that points to <a href="https://github.com/fazzone/fazzone.github.com/blob/master/schedule.html">schedule.html</a>.
+			  schedule.html is a wrapper for the real program code, which is in two files.  <a href="https://github.com/fazzone/fazzone.github.com/blob/master/javascripts/parse.js">parse.js</a>  
+			contains the table-parsing logic, and then <a href="https://github.com/fazzone/fazzone.github.com/blob/master/javascripts/draw.js">draw.js</a> has all the drawing stuff.  The
+			color-scheme-generation code is in <a href="https://github.com/fazzone/fazzone.github.com/blob/master/javascripts/color.js">color.hs</a>.
+		  </div>
+		  <h4 id="hacking">hacking</h4>
+		  <div style="padding-left:20px">
+			This code is still very much in development.  Here are some questions, tasks, and notes if you want to contribute:
+			<ul>
+			  <li>Internet Explorer compatibility: IE supports Canvas, so what gives?</li>
+			  <li>Customization page with options to set class names, colors, etc.</li>
+			  <li>Is the "convert to PNG" button good, or can it be improved?</li>
+			  <li>What other things can go in the "controls" section?</li>
+			  <li>Syntax highlighting for the Javascript on this page</li>
+			  <li>Code style/general:  I hacked this together pretty quick in an unfamiliar language, so if you know
+				any ways to refactor it to be cleaner / clearer / more idiomatic, please let me know!</li>
+			  <li>It would be pretty cool if it integrated with the <a href="https://developers.google.com/google-apps/calendar/">Google Calendar API</a>
+				and automatically entered all your classes into your Google calender for you or something</li>
+			</ul>
+		  </div>
+		</div>
+		
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
