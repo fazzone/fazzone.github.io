@@ -17,7 +17,7 @@
           <a id="forkme_banner" href="https://github.com/fazzone/fazzone.github.com">View on GitHub</a>
 
           <h1 id="project_title">Introduction to "Computing Systems"</h1>
-          <h2 id="project_tagline">(whatever the fuck that means)</h2>
+          <h4 id="project_tagline">"I am sorry to have written so long an introduction; I did not have time to write a short one"</h4>
 
         </header>
     </div>
@@ -57,21 +57,23 @@
 		
 		<div id="overview">
 		  <h3>overview - an introduction to the introduction</h3>
-		  <div id="whatisthis">
-			<h4>what is this document?</h4>
-			<p>This is intended to be a brief introduction to some lower-level problems & solutions in "computing systems" (more on this phrase and why it is
-			  used later)</p>
-			
-			<p>I assume a reasonable background in programming and general computer knowledge.</p>
-			
-			<p>You might find this page especially useful if you are (like me) a freshman Turing Scholar on winter break at the University of Texas at Austin, 
-			  who has completed CS 314H (Algorithms & Data Structures) and will take CS 429H (Computer Organization & Architecture) in the spring.</p>
-		  </div>
-		  <div id="why">
-			<h4>why did you write this?</h4>
-			<p>This is really a two-part question: 'Why were you motivated to write this?' and 'What qualifies you to write this?'.  The first one is easy:
-			  Break is really boring.  The second one is more difficult.  The most correct answer is probably 'nothing', but I think there are two reasons
-			  why you might want to read this as opposed to just breaking out the textbook.</p>
+		  <div id="meta">
+			<h4><u>meta</u></h4>
+			<div id="whatisthis">
+			  <h4>what is this document?</h4>
+			  <p>This is intended to be a brief introduction to some lower-level problems & solutions in "computing systems" (more on this phrase and why it is
+				used later)</p>
+			  
+			  <p>I assume a reasonable background in programming and general computer knowledge.</p>
+			  
+			  <p>You might find this page especially useful if you are (like me) a freshman Turing Scholar on winter break at the University of Texas at Austin, 
+				who has completed CS 314H (Algorithms & Data Structures) and will take CS 429H (Computer Organization & Architecture) in the spring.</p>
+			</div>
+			<div id="why">
+			  <h4>why did you write this?</h4>
+			  <p>This is really a two-part question: 'Why were you motivated to write this?' and 'What qualifies you to write this?'.  The first one is easy:
+				Break is really boring.  The second one is more difficult.  The most correct answer is probably 'nothing', but I think there are two reasons
+				why you might want to read this as opposed to just breaking out the textbook.</p>
 			  <ul>
 				<li><strong>Specialization</strong> - I am writing with a very specific audience in mind, so I can reference and make assumptions about what you know.</li>
 				<li><strong>Format</strong> - I am trying to be much more casual than a textbook, and much more brief.  In many places, I will probably trade absolute
@@ -79,22 +81,58 @@
 			  </ul>
 			  <p>To sum up, the answer to the question "Why would I read this instead of a textbook?" is "Because this document has different design goals that I believe 
 				make it more accessible and quicker to comprehend".</p>
+			</div>
+			<div id="feedback">
+			  <h4>Shameless solicitation for feedback</h4>
+			  <p>This is (supposed to be) a living document.  Please submit feedback!  If my writing is unclear, if I spell something wrong, or (especially) if I'm wrong
+				about something - please let me know!  This page lives on GitHub, so you can submit a pull request or
+				<a href="https://github.com/fazzone/fazzone.github.com/issues">open an issue</a>.  Or, you can write me directly; me email address is rmcq@utexas.edu</p>
+			  
+			</div>
 		  </div>
-		  <div id="feedback">
-			<h4>Shameless solicitation for feedback</h4>
-			<p>This is (supposed to be) a living document.  Please submit feedback!  If my writing is unclear, if I spell something wrong, or (especially) if I'm wrong
-			  about something - please let me know!  This page lives on GitHub, so you can submit a pull request or
-			  <a href="https://github.com/fazzone/fazzone.github.com/issues">open an issue</a>.  Or, you can write me directly; me email address is rmcq@utexas.edu</p>
-																													   
-																													   
+		  <div id="preface">
+			<h4><u>preface</u></h4>
+			<div id="computingsystems">
+			  <h4>what is meant by "Computing Systems"</h4>
+			  <p>
+				A course on "Systems" is generally considered part of the core of an education in Computer Science, which is most generally defined as the study of
+				computation.  In order to give that definition substance, we also have to define computation, which is rather difficult.  We humans have been computing
+				since we became a species; our ancestors computed the optimum trajectory of their spears so that they could bring down a mammoth and eat, the best path
+				to run to avoid being eaten by a tiger, and so on.  At some point, we invented numbers and other notation to make computation easier.  Now you could
+				precisely compute the exact number of sheep you needed to shear to have enough wool to sell to buy food over the winter.  Since
+				then, we've advanced slightly as a species, and our computing needs advanced with us.  Now we use machines to compute all sorts of things: the lowest 
+				grade you can get on your final and still pass, the cheapest way to fly from Austin to New York, how to win a game of chess, and just about everything
+				else.  Thus, the best definition I can think of for computation is 'transforming data in some meaningful way'.  You might also define a computation as:
+				'a process which depends on some amount of information as input, and produces some amount of information as output'.  Of course, these definitions
+				(just like our first) reference other terms; we will discuss technical definitions of the terms referenced in later sections (probably).
+			  </p>
+			  <p>The generality of my chosen definition of computation is intentional - but if we've been computing since the dawn of our species, why is the field of 
+				computer science so young?  Digital computers and other fancy machines certainly make certain kinds of computation easier, but you certainly can study
+				computation without them.  So why did computer science only really get established as a discipline until the invention of the computer?  To be honest,
+				I don't have an answer.  The best I can come up with is that before we had machines to compute for us, the only way to compute something was to learn
+				the necessary math (for computing is deeply entwined with mathematics) and work it out yourself.  The bottleneck of this process was comprehending the
+				math - As long as you understood, mathematically, what you needed to compute, the computation itself was generally little more than an afterthought by
+				comparison.  Only when we had to explain the process of computation to a machine, unable to 'understand' the math as we do, did we really think to 
+				separate <i>what</i> was being computed with <i>how</i> it was computed.  And by that circuitous route we arrive at my definition of computer science:
+				"the study of <i>how</i>"
+			  <p>In accordance with its origins, the field of computer science is most often studied with digital computers - a computer program is essentially a 
+				distillation of mathematical understanding into a form that can be fed to a "computing system".  This implies my definition of "Computing System":
+				something that executes a program.  The computing systems that we are most interested in are 'stored-program digital computers' - this term reflects
+				the fact that not all computers necessarily "store" their programs in a way that can be easily changed (it might be baked into the hardware), and that
+				not all computers have to be digital (operating by electrical impulses that considered to be in a discrete set of states (commonly 1 and 0) - a compute
+				might also be electromechanical (like <a href="https://en.wikipedia.org/wiki/Z3_(computer)">the Z-3</a>) or just mechanical (like Babbage's
+				<a href="https://en.wikipedia.org/wiki/Analytical_engine">Analytical Engine</a>)).  The study of 'Systems', then, for our purposes, is the study of the
+				properties, design, and implementation of stored-program digital computers.  
+			  
+			  <p>
+			</div>
 		  </div>
 		</div>
 		
 		
       </section>
     </div>
-	
-    <!-- FOOTER  -->
+
     <div id="footer_wrap" class="outer">
       <footer class="inner">
         <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>

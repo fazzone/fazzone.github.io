@@ -2,6 +2,12 @@
 	font-size: 36px;
 }
 
+#project_tagline {
+	font-size: 18px;
+	font-weight: 100;
+	text-shadow: none;
+}
+
 #main_content_wrap {
 	background-color: white;
 }
