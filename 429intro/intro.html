@@ -1,27 +1,27 @@
 <!DOCTYPE html>
 <html>
-
+  
   <head>
     <meta charset='utf-8' />
     <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-
+	
     <link rel="stylesheet" type="text/css" href="../stylesheets/stylesheet.css">
     <link rel="stylesheet" type="text/css" href="introstyle.css">
 	
     <title>Systems Intro</title>
   </head>
-
+  
   <body>
     <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/fazzone/fazzone.github.com">View on GitHub</a>
-
-          <h1 id="project_title">Introduction to "Computing Systems"</h1>
-          <h4 id="project_tagline">"I am sorry to have written so long an introduction; I did not have time to write a short one"</h4>
-
-        </header>
+      <header class="inner">
+        <a id="forkme_banner" href="https://github.com/fazzone/fazzone.github.com">View on GitHub</a>
+		
+        <h1 id="project_title">Introduction to "Computing Systems"</h1>
+        <h4 id="project_tagline">"I am sorry to have written so long an introduction; I did not have time to write a short one"</h4>
+		
+      </header>
     </div>
-
+	
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
 		<div id="contents" style="background-color: rgb(240,240,240);">
@@ -49,14 +49,100 @@
 			</li>
 			
 			<li>
-			  <a href="#data">Data & data storage</a>
+			  <strong>Part I</strong> - Data & data storage
 			  <ol>
-				<li><a href="#datavsinformation">Data vs. Information</a></li>
-				<li><a href="#datastorage">How computers store data</a></li>
-				<li><a href="#representingnumbers">Representing numbers</a></li>
-				<li><a href="#representingtext">Representing text</a></li>
+				<li>Data vs. Information</li>
+				<li>How computers store data</li>
+				<li>Representing integers:
+				  <ol>
+					<li>Binary Coded Decimal</li>
+					<li>One's Complement</li>
+					<li>Two's Complement</li>
+				  </ol>
+				</li>
+				<li>Representing text:
+				  <ol>
+					<li>EBCDIC</li>
+					<li>ASCII</li>
+					<li>Unicode</li>
+				  </ol>
+				</li>
+				<li>Representing programs:
+				  <ol>
+					<li>Machine code</li>
+					<li>Introduction to assembly language</li>
+				  </ol>
+				</li>
 			  </ol>
 			</li>
+			<li>
+			  <strong>Part II</strong> - Code & program execution
+			  <ol>
+				<li>CPUs & ISAs</li>
+				<li>Accessing data:
+				  <ol>
+					<li>Registers</li>
+					<li>Memory buses & addressing</li>
+					<li>Harvard & von Neumann architectures</li>
+					<li>Address modes</li>
+				  </ol>
+				</li>
+				<li>Operating on data:
+				  <ol>
+					<li>Arithmetic</li>
+					<li>Logical operations</li>
+				  </ol>
+				<li>Control:
+				  <ol>
+					<li>Jumps & Conditional jumps</li>
+					<li>Loops in assembly</li>
+					<li>Jump tables</li>
+					<li>Procedures & the stack</li>
+					<li>Interrupts</li>
+				  </ol>
+				</li>				
+			  </ol>
+			</li>
+
+			<li><strong>Part III</strong> - Putting together the system
+			  <ol>
+				<li>OS Concepts
+				  <ol>
+					<li>Memory management & virtual memory</li>
+					<li>Multitasking</li>
+					<li>The system ABI/API</li>
+					<li>The compiler & the linker</li>
+				  </ol>
+				</li>
+				<li>Introduction to C (for Java programmers)
+				  <ol>
+					<li><code>#include</code> and the preprocessor</li>
+					<li>Pointers</li>					
+					<li><code>struct</code> & <code>union</code></li>
+					<li>Dynamic memory allocation: <code>malloc</code> & <code>free</code></li>
+				  </ol>
+				</li>
+				<li>Counterpoint: Introduction to Lisp
+				  <ol>
+					<li>S-expressions</li>
+					<li>Cons cells</li>
+					<li><code>eval</code></li>
+					<li>Memory management in Lisp</li>
+					<li>Bootstraping</li>
+				  </ol>
+				</li>
+			  </ol>
+			</li>
+
+			<li><strong>Part IV</strong> - Making it Fast
+			  <ol>
+				<li>Caching</li>
+				<li>Branch prediction</li>
+				<li>Pipelining, superscalar architectures, and VLIW systems</li>
+				<li>RISC vs CISC</li>
+			  </ol>
+			</li>
+			
 			
 		  </ol>
 		</div>
@@ -72,7 +158,7 @@
 			  
 			  <p>I assume a reasonable background in programming and general computer knowledge.</p>
 			  
-			  <p>You might find this page especially useful if you are (like me) a freshman Turing Scholar on winter break at the University of Texas at Austin, 
+			  <p>You might find this page especially useful if you are (like me) a freshman Turing Scholar on winter break from the University of Texas at Austin, 
 				who has completed CS 314H (Algorithms & Data Structures) and will take CS 429H (Computer Organization & Architecture) in the spring.</p>
 			</div>
 			<div id="why">
@@ -90,10 +176,9 @@
 			</div>
 			<div id="feedback">
 			  <h4>Shameless solicitation for feedback</h4>
-			  <p>This is (supposed to be) a living document.  Please submit feedback!  If my writing is unclear, if I spell something wrong, or (especially) if I'm wrong
-				about something - please let me know!  This page lives on GitHub, so you can submit a pull request or
+			  <p>This is (supposed to be) a living document.  Please submit feedback!  If my writing is unclear, if I spell something wrong, if I'm wrong
+				about something, or <i>especially</i> if you have an unanswered question - please let me know!  This page lives on GitHub, so you can submit a pull request or
 				<a href="https://github.com/fazzone/fazzone.github.com/issues">open an issue</a>.  Or, you can write me directly; me email address is rmcq@utexas.edu</p>
-			  
 			</div>
 		  </div>
 		  <div id="preface">
@@ -155,7 +240,11 @@
 				your understanding of what I'm talking about (or things in general) is to try to imagine the consequences if different choices were made in the design
 				of some system.  Some examples: What would our government be like if we had <a href="https://en.wikipedia.org/wiki/Proportional_representation">
 				  proportional representation</a> (as opposed to winner-takes-all elections) in the House & Senate?  What would our language be like if we used an 
-				ideographic writing system (as does Chinese)?  I will try to include some such considerations as I discuss computing systems.
+				ideographic writing system (as does Chinese)?  These questions become more interesting the more fundamental the change: it is not very interesting to
+				consider how Java would be different if it used a colon (like C++) instead of the word <code>extends</code> to denote inheritance - it would be more
+				interesting to consider
+				how Java would be different if it used <a href="http://javascript.crockford.com/prototypal.html">prototypal inheritance</a> instead of the more 
+				conservative class-based model.  I will try to include some such considerations as I discuss computing systems.
 			  </p>
 			</div>
 		  </div>
