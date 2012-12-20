@@ -1,0 +1,12 @@
+#project_title {
+	font-size: 36px;
+}
+
+#main_content_wrap {
+	background-color: white;
+}
+
+/* indentation */
+#main_content div div, #main_content div ul, #main_content div ol {
+	padding-left: 20px;
+}
