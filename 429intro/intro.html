@@ -31,25 +31,31 @@
 			<li>
 			  <a href="#overview">overview</a>
 			  <ol>
-				<li>meta
+				<li><a href="#meta">meta</a>
 				  <ol>
 					<li><a href="#whatisthis">what is this document?</a></li>
 					<li><a href="#why">why did you write this?</a></li>
 					<li><a href="#feedback">shameless solicitation for feedback</a></li>
 				  </ol>
 				</li>
-				<li>preface
+				<li><a href="#preface">preface</a>
 				  <ol>
-					<li>what is meant by "Computing Systems"?</li>
-					<li>why is this interesting?</li>
-					<li>my approach</li>
+					<li><a href="#computingsystems">what is meant by "Computing Systems"?<a></li>
+					<li><a href="#whyinteresting">why is this interesting?</a></li>
+					<li><a href="#myapproach">my approach</a></li>
 				  </ol>
 				</li>
 			  </ol>
 			</li>
 			
 			<li>
-			  
+			  <a href="#data">Data & data storage</a>
+			  <ol>
+				<li><a href="#datavsinformation">Data vs. Information</a></li>
+				<li><a href="#datastorage">How computers store data</a></li>
+				<li><a href="#representingnumbers">Representing numbers</a></li>
+				<li><a href="#representingtext">Representing text</a></li>
+			  </ol>
 			</li>
 			
 		  </ol>
@@ -128,7 +134,29 @@
 			<div id="whyinteresting">
 			  <h4>why is this interesting?</h4>
 			  <p>A "Systems" class is a core part of pretty much every computer science degree because it gives you grounding in what is actually happening when you
-				program.  <p>
+				program.  I think this is interesting in and of itself, but it is also helpful when designing for performance - understanding what is going on at
+				multiple levels of the system makes it easier to write performant programs.  Also, it is important to note that no programs execute in a vacuum - by
+				definition, a program executes on a computer system, so it is good to have knowledge of the system(s) your program run(s) on.  A course in systems, 
+				however, is about more than that.  As a programmer, you interact with sytems.  The point of education is to be a critical observer of the world around you
+				- in order to be a critical observer of something, you must understand the <i>choices</i> in its design.  A student of political science analyzes 
+				governments and can tell you why certain governments are they way they are (and the implications of this),  a student of literature analyzes different
+				works and can tell you why certain works are written the way they are (and the implications of this), and a student of computer science should be able
+				to do the same with programs.  Since a system defines the behavior of its programs, understanding systems is a necessary skill in computer science.
+			  </p>
+			</div>
+			<div id="myapproach">
+			  <h4>my approach</h4>
+			  <p>I couldn't help but skirt around it in previous sections, but my approach to talking about things is going to be to present problems & solutions.
+				I think this is the cleanest way to quickly gain a deep understanding of all sorts of things that are designed by humans - all design efforts have
+				problems, trade-offs, choices, pressures, goals, etc.  If you understand the problems, you can put yourself in the designers' shoes and think how
+				you would come up with a solution - and then compare your way to the 'actual' way.  This approach is also easy to explain in chronological fashion -
+				the first attempts at a design are often the simplest, and only after they are used and studied are their shortcomings realized and fixed in later
+				designs.  In all cases where it is practical, I will try to present as many alternatives as possible to each design problem.  An easy way to check
+				your understanding of what I'm talking about (or things in general) is to try to imagine the consequences if different choices were made in the design
+				of some system.  Some examples: What would our government be like if we had <a href="https://en.wikipedia.org/wiki/Proportional_representation">
+				  proportional representation</a> (as opposed to winner-takes-all elections) in the House & Senate?  What would our language be like if we used an 
+				ideographic writing system (as does Chinese)?  I will try to include some such considerations as I discuss computing systems.
+			  </p>
 			</div>
 		  </div>
 		</div>
