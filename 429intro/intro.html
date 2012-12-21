@@ -4,16 +4,21 @@
     <meta charset='utf-8' />
     <link rel="stylesheet" type="text/css" href="../stylesheets/stylesheet.css">
     <link rel="stylesheet" type="text/css" href="introstyle.css">
+	<script type="text/x-mathjax-config">
+	  MathJax.Hub.Config({
+      	tex2jax: {inlineMath: [["$","$"],["\\(","\\)"]]}
+	  });
+	</script>
+	<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/2.1-latest/MathJax.js?config=TeX-AMS_HTML-full"></script>
+	<script type="text/javascript" src="diagrams.js"></script>
     <title>Systems Intro</title>
   </head>
-  <body>
+  <body onload="processDOM(document.body)">
     <div id="header_wrap" class="outer">
       <header class="inner">
         <a id="forkme_banner" href="https://github.com/fazzone/fazzone.github.com">View on GitHub</a>
-		
         <h1 id="project_title">Introduction to "Computing Systems"</h1>
-        <h4 id="project_tagline">"I am sorry to have written so long an introduction; I did not have time to write a short one"</h4>
-		
+        <h4 id="project_tagline">"I am sorry to have written so long an introduction; I did not have time to write a short one"</h4>		
       </header>
     </div>
 	
@@ -44,11 +49,11 @@
 			</li>
 			
 			<li>
-			  <strong>Part I</strong> - Data & data storage
+			  <a href="#data"><strong>Part I</strong> - Data & data storage</a>
 			  <ol>
-				<li>Data vs. Information</li>
-				<li>How computers store data</li>
-				<li>Representing integers:
+				<li><a href="#datavsinformation">Data vs. Information</a></li>
+				<li><a href="#datastorage">How computers store data</a></li>
+				<li><a href="#integers">Representing integers:</a>
 				  <ol>
 					<li>Binary Coded Decimal</li>
 					<li>One's Complement</li>
@@ -119,7 +124,7 @@
 				</li>
 				<li>Counterpoint: Introduction to Lisp
 				  <ol>
-					<li>S-expressions</li>
+					<li>Symbols & S-expressions</li>
 					<li>Cons cells</li>
 					<li><code>eval</code></li>
 					<li>Memory management in Lisp</li>
@@ -143,9 +148,9 @@
 		</div>
 		
 		<div id="overview">
-		  <h3>overview - an introduction to the introduction</h3>
+		  <h2>overview - an introduction to the introduction</h2>
 		  <div id="meta">
-			<h4><u>meta</u></h4>
+			<h3>meta</h3>
 			<div id="whatisthis">
 			  <h4>what is this document?</h4>
 			  <p>This is intended to be a brief introduction to some lower-level problems & solutions in "computing systems" (more on this phrase and why it is
@@ -177,7 +182,7 @@
 			</div>
 		  </div>
 		  <div id="preface">
-			<h4><u>preface</u></h4>
+			<h3>preface</h3>
 			<div id="computingsystems">
 			  <h4>what is meant by "Computing Systems"?</h4>
 			  <p>
@@ -221,8 +226,15 @@
 				- in order to be a critical observer of something, you must understand the <i>choices</i> in its design.  A student of political science analyzes 
 				governments and can tell you why certain governments are they way they are (and the implications of this),  a student of literature analyzes different
 				works and can tell you why certain works are written the way they are (and the implications of this), and a student of computer science should be able
-				to do the same with programs.  Since a system defines the behavior of its programs, understanding systems is a necessary skill in computer science.
+				to do the same with programs.  Since a system defines the behavior of its programs, understanding systems is a necessary skill in computer science.				
 			  </p>
+			  <p>Furthermore, a good computer scientist should be educated in systems so as to be prepared for things going wrong 
+				(and <a href="http://www.joelonsoftware.com/articles/LeakyAbstractions.html">leaky abstractions</a>).  Abstraction is the key way we deal with complexity
+				in computer science (and any field, really).  The goal of an abstraction is to 'seal off' complex implementation details and present a simple model for 
+				understanding something.  "Pushing the gas makes the car go" is a good abstraction for your car's drivetrain - right up until something goes wrong.  Then
+				all of a sudden your abstraction is broken and you have no idea why.  Similarly, you can just assume the entire stack of technology going from solid-state
+				physics to the standard library of whatever programming language you are using "just works", or you can be prepared for things going wrong.  Most of the
+				things in that open interval would be considered "systems".
 			</div>
 			<div id="myapproach">
 			  <h4>my approach</h4>
@@ -238,13 +250,94 @@
 				ideographic writing system (as does Chinese)?  These questions become more interesting the more fundamental the change: it is not very interesting to
 				consider how Java would be different if it used a colon (like C++) instead of the word <code>extends</code> to denote inheritance - it would be more
 				interesting to consider
-				how Java would be different if it used <a href="http://javascript.crockford.com/prototypal.html">prototypal inheritance</a> instead of the more 
+				how Java would be different if it used <a href="https://en.wikipedia.org/wiki/Prototype-based_programming">prototypal inheritance</a> instead of the more 
 				conservative class-based model.  I will try to include some such considerations as I discuss computing systems.
 			  </p>
 			</div>
 		  </div>
 		</div>
 		
+		<div id="data">
+		  <h2>Data & data storage</h2>
+		  <div id="datavsinformation">
+			<h3>Data vs. Information</h3>
+			<p>Before we get into a discussion of how different kinds of data are represented in different kinds of systems, I think that we should first discuss
+			  the difference between data and information.  This might be a pretty fluffy distinction, and the concepts do certainly overlap, but I think that it's
+			  worth discussing if only because I think the theory of information is very interesting.  To paraphrase <a href="https://en.wikipedia.org/wiki/Data">
+				Wikipedia</a>, the difference between data and information is the level of abstraction.  Data is just, well data; the value of some variable.  
+			  Only when a human interprets the data does it become information.  The fundamental unit of both is the bit - a binary distinction of some kind: "yes"
+			  or "no", "true" or "false", "1" or "0", etc.  As an example (which I believe I am stealing from
+			  <a href="http://www.amazon.com/Decoding-Universe-Information-Explaining-Everything/dp/0143038397"><i>Decoding the Universe</i></a>), consider the
+			  lighting of the lanterns in the steeple of the Old North Church during the Revolutionary War - one if by land, two if by sea.  Anyone who saw the
+			  steeple could have collected
+			  the one bit of data (were there two lanterns or one?), but only the patriots across the river were able to decode this data into the corresponding one
+			  bit of <i>information</i>: were the British coming by land or by sea?  This is the distinction between data & information at its most immaterial: here, both
+			  are pretty much the same thing.  However, had the patriots already discovered by some other means that the British army was coming by sea, the one bit
+			  of data would have revealed to them zero bits of information.  This suggests another distinction between information and data: information, by defintion,
+			  is non-redundant.  If I write you a letter, but misspell some words, your ability to understand my meaning in spite of my poor spelling is an example of 
+			  redundancy - I used more data than required to transmit the amount of information in the letter. </p>
+			<p>The mathematical name for this concept is <a href="https://en.wikipedia.org/wiki/Entropy_(information_theory)">information content</a> which, interestingly, 
+			  is closely related to the notion of entropy in thermodynamics.  In information theory, the entropy of some variable is
+			  a measure of how unpredictable (<i>non</i>-redundant) it is.  The previous example of the letter is made possible because "English text has about one bit of
+			  entropy for each character"<sup><a href="https://en.wikipedia.org/wiki/Entropy_(information_theory)#cite_ref-8">[wiki]</a></sup>.  That statement implies
+			  that, given a stream of characters representing English text, you could be expected to accurately guess the next character about half the time.  This is
+			  how compression algorithms work - they exploit low-entropy source material and use less redundant forms of encoding to save (data) space.  Given a completely
+			  random input, a compression algorithm should be expected to not compress it all - or possibly even make it larger (we see this by the pigeonhole principle; 
+			  if a compression algorithm is able to make some inputs smaller, it must make a corresponding number of inputs larger - otherwise you'd be encoding information
+			  "for free").  This, in turn, is why compressing something that is already compressed (a JPEG image or an MP3 music file) is stupid.  </p>
+			<p>If you want to read more about information theory, the book I cited previously,
+			  <a href="http://www.amazon.com/Decoding-Universe-Information-Explaining-Everything/dp/0143038397"><i>Decoding the Universe</i></a> is a great read.  You can
+			  also read Claude Shannon's original paper <a href="https://docs.google.com/a/utexas.edu/viewer?a=v&q=cache:UlvwzqigMQIJ:cm.bell-labs.com/cm/ms/what/shannonday/shannon1948.pdf+&hl=en&gl=us&pid=bl&srcid=ADGEEShzLsrhAOZxjkAuOTPSBYERGoupPl-DgoyizF5Oqkxxwp-NXvR7e-Wo_-t5fqmLZZRBu-G4uRpREeOYdvdcLJAj9LYk6HwCYej-aGyiy5elzwPOpsg5SSZgVabP9mcrUus0Z8h1&sig=AHIEtbSz7BkLkwZD4sTDOmRe6GzVJAdAsg">A Mathematical Theory of Communication</a> - it is reasonably accessible, as far as papers which create entire new fields of mathematics go.  (Shannon is also famous for writing what is commonly hailed as the most important master's thesis of all time, in which he realized the connection between Boolean logic and
+			  digital circuits - a direct antecedent to the construction of the very first digital computers).
+		  </div>
+		  
+		  <div id="datastorage">
+			<h3>How computers store data</h3>
+			<p>As I discussed previously, the main focus of this modern computing is on digital stored-program computers.  Digital, in this term, refers to how these
+			  computers store data.  In a digital system, we deal with discrete values (as opposed to an analog system, where we would deal with continuous values).
+			  In the real world (quantum-mechanical nitpicks aside), variables such as voltage across a wire are continuous.  Thus, in digital circuit design, we 
+			  view voltages above some threshold as "high" (1), and those below it as "low" (0).  This binary quantization is completely arbitrary, we might just as 
+			  well divide the continuous range of voltages into three discrete parts - then we would have a ternary computer.  In practice, however, every computer
+			  system has used (at least at this level) binary.  Ternary computers remain an interesting curiosity, see <a href="http://tunguska.sourceforge.net/about.html">
+				Tunguska</a> for a ternary computer emulator.</p>
+			<p>Data storage, then, in most computers, is just a sequence of bits.  Mathematically speaking, computers store data as a sequence of <i>symbols</i> drawn
+			  from the set of possibly symbols, called the <i>alphabet</i> (commonly denoted $\Sigma$).  A binary computer is simply the case where $\Sigma = \{1,0\}$
+			  .  Note that "1" and "0" are completely arbitrary here; all N-symbol alphabets are completely isomorphic.  We could just as easily have $\Sigma = 
+			  \{😃, 😞\}$ or whatever.  Any data we store is simply a way we have of interpreting a sequence of symbols.  Thus, to say "to a computer
+			  everything is a number" is (in my opinion) not really accurate, because even the concept of a number is too high-level.  All that exists is a sequence of high
+			  and low voltages, or a sequence of symbols - depending if you are an engineer or a mathematician.  All the computer does is manipulate bits (data), and
+			  any meaning (information) we attribute to the process is a result of interpretations that exist solely in our minds (and their extensions, our programs).
+			  
+			  <div id="integers">
+				<h4>Representing integers</h4>
+				<p>One of the most fundamental things we might wish to represent with a computer are integers.  Since our computers work with discrete symbols,
+				  and the integers are discrete objects, the representation is rather natural, though not without its little quirks.  Contrast this with the
+				  the reals, where any attempt at representation is doomed to fail - no matter what alphabet or encoding you use, no fixed-length string can hold
+				  enough information to represent any real number.  We get by with floating-point (the common standard is <a href="https://en.wikipedia.org/wiki/IEEE_floating_point">IEEE 754</a>), but I consider specific details of floating-point representation outside the scope of this introduction.  (although you should read 
+				  <a href="http://docs.oracle.com/cd/E19957-01/806-3568/ncg_goldberg.html">What Every Computer Scientist Should Know About Floating-Point Arithmetic</a>)</p>
+				<div id="ebcdic">
+				  <h5>Binary coded decimal</h5>
+				  <p>Probably one of the earliest widespread encodings for integers was binary-coded-decimal, or BCD.  In a BCD representation, each base-10 digit of
+					a number is encoded seprately, in binary.  That is, </p>
+					<table id="bcd_table" style="margin-left: 40px;" border="1"></table>
+				  <p>Seems reasonable enough so far.  But in BCD, <i>each decimal digit is encoded individually</i> (hence the name) - for example, the number <code>129</code>
+					might be encoded as <code>0001 0010 1001</code>.  Demo: type in a number, see its BCD encoding</p>
+				  <div>
+					<input type="text" value="129" id="bcddemoinput" oninput = "redrawBCDDemo()" />
+					<table id="bcddemotable" style="margin-left: inherit; text-align: center;" border="1">
+					<tr border="0"><td>1</td><td>2</td><td>9</td></tr>
+					<tr><td>0001</td><td>0010</td><td>1001</td></tr>
+				  </table>
+
+				  </div>
+					
+				  <span id="derp" herp="yes"></span>
+				</div>
+				  
+				  
+			  </div>
+		  </div>
+		</div>
 		
       </section>
     </div>
@@ -252,11 +345,9 @@
     <div id="footer_wrap" class="outer">
       <footer class="inner">
         <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+		<p>Math rendered with <a href="http://www.mathjax.org/">MathJax</a></p>
       </footer>
     </div>
-	
-    
-
   </body>
 </html>
 
