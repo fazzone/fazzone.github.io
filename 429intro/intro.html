@@ -55,8 +55,8 @@
 				<li><a href="#datastorage">How computers store data</a></li>
 				<li><a href="#integers">Representing integers:</a>
 				  <ol>
-					<li>Binary Coded Decimal</li>
-					<li>One's Complement & Two's Complement</li>
+					<li><a href="#bcd">Binary Coded Decimal</a></li>
+					<li><a href="#onescomptwoscomp">One's Complement & Two's Complement</a></li>
 				  </ol>
 				</li>
 				<li>Representing text:
@@ -314,7 +314,7 @@
 				  the reals, where any attempt at representation is doomed to fail - no matter what alphabet or encoding you use, no fixed-length string can hold
 				  enough information to represent any real number.  We get by with floating-point (the common standard is <a href="https://en.wikipedia.org/wiki/IEEE_floating_point">IEEE 754</a>), but I consider specific details of floating-point representation outside the scope of this introduction.  (although you should read 
 				  <a href="http://docs.oracle.com/cd/E19957-01/806-3568/ncg_goldberg.html">What Every Computer Scientist Should Know About Floating-Point Arithmetic</a>)</p>
-				<div id="ebcdic">
+				<div id="bcd">
 				  <h5>Binary coded decimal</h5>
 				  <p>Probably one of the earliest widespread encodings for integers was binary-coded-decimal, or BCD.  In a BCD representation, each base-10 digit of
 					a number is encoded seprately, in binary.  That is, </p>
@@ -369,7 +369,7 @@
 					negative numbers is the only difference between the two systems.  Two's complement vs. one's complement is a very low-level decision made in the course
 					of designing a system - the major differences are observed in designing hardware to do math with binary numbers (an ALU - arithmetic logic unit).
 					The design of & distinctions between these circuits is outside the scope of this book, though if you want to learn more about things like that
-					(and pretty much everything else that makes up a computer), I highly reccommend <a href="http://www.amazon.com/Code-Language-Computer-Hardware-Software/dp/0735611319"><i>Code</i></a>.
+					(and pretty much everything else that makes up a computer), I highly reccommend <a href="http://www.amazon.com/Code-Language-Computer-Hardware-Software/dp/0735611319"><i>Code</i> by Charles Petzold</a>.
 				</div>
 				  
 				  
