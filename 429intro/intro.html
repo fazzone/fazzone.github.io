@@ -56,8 +56,7 @@
 				<li><a href="#integers">Representing integers:</a>
 				  <ol>
 					<li>Binary Coded Decimal</li>
-					<li>One's Complement</li>
-					<li>Two's Complement</li>
+					<li>One's Complement & Two's Complement</li>
 				  </ol>
 				</li>
 				<li>Representing text:
@@ -321,17 +320,56 @@
 					a number is encoded seprately, in binary.  That is, </p>
 					<table id="bcd_table" style="margin-left: 40px;" border="1"></table>
 				  <p>Seems reasonable enough so far.  But in BCD, <i>each decimal digit is encoded individually</i> (hence the name) - for example, the number <code>129</code>
-					might be encoded as <code>0001 0010 1001</code>.  Demo: type in a number, see its BCD encoding</p>
+					might be encoded as <code>0001 0010 1001</code>.  Demo: type in a number, see its BCD encoding. (does not work with negatives; BCD traditionally uses
+				  a sign digit at the beginning to denote...well, sign)</p>
 				  <div>
 					<input type="text" value="129" id="bcddemoinput" oninput = "redrawBCDDemo()" />
 					<table id="bcddemotable" style="margin-left: inherit; text-align: center;" border="1">
-					<tr border="0"><td>1</td><td>2</td><td>9</td></tr>
-					<tr><td>0001</td><td>0010</td><td>1001</td></tr>
-				  </table>
-
+					  <tr border="0"><td>1</td><td>2</td><td>9</td></tr>
+					  <tr><td>0001</td><td>0010</td><td>1001</td></tr>
+					</table>
 				  </div>
 					
-				  <span id="derp" herp="yes"></span>
+				  <p>So why use such a seemingly-stupid and baroque system to represent numbers?  Why not just count in binary?  Well, BCD has two main advantages
+				  over regular binary place-value encodings.  First, rounding in BCD works just like rounding in decimal: in a regular binary system, numbers such as 0.2
+				  cannot be represented exactly (much as 1/3 cannot be represented exactly in a fixed number of decimal digits).  Second, it is very easy to convert
+				  BCD to human-readable form, especially in hardware.  A converter that takes the 4 bits of a BCD digit and drives a 7-segment display is just a
+				  truth table, and thus can be implemented in hardware.</p>
+				  <p>
+					From the <a href="http://macao.communications.museum/eng/Exhibition/SecondFloor/MoreInfo/Displays.html">Macao Communications Museum</a>:
+					(refers to the individual bits in the BCD representation of a digit as D,C,B,A)
+					BCD to 7-segment decoder diagram (omits implementation):
+					<img src="http://macao.communications.museum/images/exhibits/2_18_6_3_eng.png">
+					BCD to 7-segment decoder truth table:
+					<img src="http://macao.communications.museum/images/exhibits/2_18_6_2_eng.png">
+				  </p>
+				  <p>
+					This is in contrast to a regular binary place-value system, where much more complex hardware would be required to present numbers in decimal format.
+					Also, BCD wastes a lot of space compared to a regular binary system.  For some early computers (especially IBM's), the advantages were judged to 
+					outweigh the disadvantages, and of course once you have designed a system to use BCD, it is very difficult to change it.  Most designers, however,
+					exhibited slightly more sanity, and now (as then) BCD is mostly a curiosity.
+				  </p>
+				</div>
+				<div id="onescomptwoscomp">
+				  <h5>One's Complement & Two's Complement</h5>
+				  <p>
+					Now we'll talk about some systems of representing integers that actually make sense.  What do to with positive numbers is pretty obvious, just
+					use a regular binary system with place-value just like how we write decimal.  That is, the number <code>129</code> would be represented as 
+					<code>10000001</code> - 1 in 128's place, and 1 in the 1's place for 128 + 1 = 129.  The trick is in representing negative numbers.  In a
+					one's complement system, a negative number is represented as being subtracted from the highest representable number.  However, in a two's
+					complement system, negative numbers are "subtracted from" the highest representable number <i>plus one</i> - or $2^n$ (where n is the number
+					of bits), hence the name.
+				  </p>
+				  <p>Some examples will make this clearer.  Suppose you have 8 bits, and you want to represent -17.  In a one's complement system, additive negation
+					(subtraction from 0) is the same as a bitwise negation, so you take the representation of +17, 10001, and negate it to get 01110.  Now consider
+					what happens when you negate 0.  Mathematically, -0 is 0, but in a one's complement system, -0 is the number with all bits set ($2^n -1$).  Of course, 
+					using negative zero instead of positive zero won't affect the outcome of any calculations, but the fact that it exists is one of the disadvantages
+					of one's complement systems.</p>
+				  <p>Essentially all systems today use two's complement, where the number with all bits set is -1 and not -0.  This shifting by one while representing
+					negative numbers is the only difference between the two systems.  Two's complement vs. one's complement is a very low-level decision made in the course
+					of designing a system - the major differences are observed in designing hardware to do math with binary numbers (an ALU - arithmetic logic unit).
+					The design of & distinctions between these circuits is outside the scope of this book, though if you want to learn more about things like that
+					(and pretty much everything else that makes up a computer), I highly reccommend <a href="http://www.amazon.com/Code-Language-Computer-Hardware-Software/dp/0735611319"><i>Code</i></a>.
 				</div>
 				  
 				  
