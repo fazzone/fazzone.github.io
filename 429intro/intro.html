@@ -77,15 +77,15 @@
 			  </ol>
 			</li>
 			<li>
-			  <strong>Part II</strong> - Code & program execution
+			  <a href="#code-program-exec"><strong>Part II</strong> - Code & program execution</a>
 			  <ol>
-				<li>CPUs & ISAs</li>
-				<li>Accessing data:
+				<li><a href="#cpus-isas">CPUs & ISAs</a></li>
+				<li><a href="#accessing-data">Accessing Data</a>
 				  <ol>
-					<li>Registers</li>
-					<li>Memory buses & addressing</li>
-					<li>Harvard & von Neumann architectures</li>
-					<li>Addressing modes</li>
+					<li><a href="#registers">Registers</a></li>
+					<li><a href="#buses-addressing">Memory buses & addressing</a></li>
+					<li><a href="#harvard-von-neumann">Harvard & von Neumann architectures</a></li>
+					<li><a href="#addressing-modes">Addressing modes</a></li>
 				  </ol>
 				</li>
 				<li>Operating on data:
@@ -105,7 +105,7 @@
 			  </ol>
 			</li>
 
-			<li><strong>Part III</strong> - Putting together the system
+			<li><a href="#building-system"><strong>Part III</strong> - Putting together the system</a>
 			  <ol>
 				<li>OS Concepts
 				  <ol>
@@ -115,13 +115,13 @@
 					<li>The compiler & the linker</li>
 				  </ol>
 				</li>
-				<li>Introduction to C (for Java programmers)
+				<li><a href="#introc">Introduction to C (for Java programmers)</a>
 				  <ol>
-					<li>The essence of C</li>
-					<li><code>#include</code> and the preprocessor</li>
-					<li>Pointers</li>					
-					<li><code>struct</code> & <code>union</code></li>
-					<li>Dynamic memory allocation: <code>malloc</code> & <code>free</code></li>
+					<li><a href="#cessence">The essence of C</a></li>
+					<li><a href="#include-and-preprocessor"><code>#include</code> and the preprocessor</a></li>
+					<li><a href="#zomg-pointers">Pointers</a></li>					
+					<li><a href="#structunion"><code>struct</code> & <code>union</code></a></li>
+					<li><a href="#mallocfree">Dynamic memory allocation: <code>malloc</code> & <code>free</code></a></li>
 				  </ol>
 				</li>
 				<li>Counterpoint: Introduction to Lisp
@@ -668,18 +668,19 @@
 				<code>function(array + (N - S))</code> (where S is the size of the array).  So for example here's a binary search function (it's probably buggy but it illustrates
 				the basic idea):
 			  </p>
-			  <!--			  <pre><code>
-							  int binsearch(int[] ar, int key, int size) {	//search the first 'size' cells in 'ar' for 'key'
-							  if (size == 0)
-							  return -1;
-							  int mid = size / 2;
-							  if (ar[mid]  > key)
-							  return binsearch(ar, key, mid - 1);
-							  if (ar[mid] < key)
-							  return binsearch(ar + mid + 1, key, mid);
-							  else return ar[mid];
-							  }
-							  </pre></code>			  !-->
+			  <pre><code>
+				int binsearch(int[] ar, int key, int size) {	//search the first 'size' cells in 'ar' for 'key'
+				  	if (size == 0)
+				  		return -1;
+				  	int mid = size / 2;
+				  	if (ar[mid]  > key)
+						return binsearch(ar, key, mid - 1);
+				  	if (ar[mid] < key)
+						return binsearch(ar + mid + 1, key, mid);
+					else return ar[mid];
+				}
+
+			  </pre></code>
 			</div>
 			
 			<div id="structunion">
