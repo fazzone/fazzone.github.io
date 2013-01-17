@@ -85,7 +85,7 @@
 					<li>Registers</li>
 					<li>Memory buses & addressing</li>
 					<li>Harvard & von Neumann architectures</li>
-					<li>Address modes</li>
+					<li>Addressing modes</li>
 				  </ol>
 				</li>
 				<li>Operating on data:
@@ -117,6 +117,7 @@
 				</li>
 				<li>Introduction to C (for Java programmers)
 				  <ol>
+					<li>The essence of C</li>
 					<li><code>#include</code> and the preprocessor</li>
 					<li>Pointers</li>					
 					<li><code>struct</code> & <code>union</code></li>
@@ -125,6 +126,7 @@
 				</li>
 				<li>Counterpoint: Introduction to Lisp
 				  <ol>
+					<li>The essence of Lisp</li>
 					<li>Symbols & S-expressions</li>
 					<li>Cons cells</li>
 					<li><code>eval</code></li>
@@ -176,9 +178,11 @@
 				make it more accessible and quicker to comprehend".</p>
 			</div>
 			<div id="feedback">
-			  <h4>Shameless solicitation for feedback</h4>
-			  <p>This is (supposed to be) a living document.  Please submit feedback!  If my writing is unclear, if I spell something wrong, if I'm wrong
-				about something, or <i>especially</i> if you have an unanswered question - please let me know!  This page lives on GitHub, so you can submit a pull request or
+			  <h4>shameless solicitation for feedback</h4>
+			  <p>This is (supposed to be) a living document.  Neither my knowledge nor my attention to detail are infinite (in fact both are much closer to infinitesimal). 
+				Therefore, I'm probably wrong about a lot of stuff.  Because I'd always like to learn more, and because I'd like this document to be as good as it can be, 
+				I entreat you to submit feedback!  If my writing is unclear, if I spell something wrong, if I'm wrong about something, or <i>especially</i> if you have an 
+				unanswered question - please let me know!  This page lives on GitHub, so you can submit a pull request or
 				<a href="https://github.com/fazzone/fazzone.github.com/issues">open an issue</a>.  Or, you can write me directly; me email address is rmcq@utexas.edu</p>
 			</div>
 		  </div>
@@ -452,6 +456,290 @@
 		  </div>
 		</div>
 		
+
+		<div id="code-program-exec">
+		  <h2>Code & Program Execution</h2>
+		  <div id="cpus-isas">
+			<h3>CPUs & ISAs</h3>
+			<p>What a surprise - more three-letter acronyms.  Let's expand them before we do anything else: CPU = Central Processing Unit;
+			  ISA = Instruction Set Architecture.  That said, these are two very important and closely-related concepts.  The term CPU refers to the piece of
+			  hardware which <i>implements</i> an ISA.  An ISA is, to give a rather formal definition, a mapping from opcodes to actions performed by the CPU.
+			  Let's relate both of these terms to another, the all-encompassing <i>machine</i>, via philosophical allegory: the machine (person) needs a CPU
+			  (body) to exist within and interact with the Real World, but its ISA (soul) is in many ways conceptually closer to its "identity".  </p>
+			<p>For any architecure, extensive documentation of the ISA is absolutely essential - otherwise how would anyone know how to program your machine?
+			  Intel makes this documentation publicly available, from
+			  <a href="http://www.intel.com/content/www/us/en/processors/architectures-software-developer-manuals.html">Intel's web site</a> you can download
+			  a complete reference for the x86 and x86-64 architectures, containing every single opcode sorted alphabetically by assembly-language mnemonic.
+			</p>
+			<p>The person-body-soul analogy given above is a classic example of explaining a CS concept via metaphor - useful at first, but harmful if taken
+			  too literally.  For example, in the real world all people we encounter have both body and soul (unless you believe in ghosts).  With CPUs & ISAs,
+			  however, this restriction need not apply.  While a CPU that didn't implement an ISA wouldn't be much more than a silicon paperweight, an ISA
+			  with no hardware CPU implementing it is quite a usual thing.  Since such ISAs are not designed with hardware in mind, they can make radically 
+			  different design choices than "real" ones like x86 and ARM.  A good example is the Java Virtual Machine - it is a stack machine (instead of
+			  using registers as the 'immediate working area', all operands are stored on a stack) with some very specialized opcodes, including 
+			  <code><a href="http://cs.au.dk/~mis/dOvs/jvmspec/ref--35.html">invokevirtual</a></code> which does all the legwork of virtual-method dispatch
+			  in one 'instruction'.  The Java SDK ships with a disassembler for JVM bytecode, <code>javap</code>.  To see what JVM bytecode-assembly looks like,
+			  run <br/><code>$ javap -c Whatever.java</code><br/> (-c tells it to include the code in the output, as opposed to just method & class declarations).
+			</p>
+			<p>One more quick point - although two processors may expose the same ISA to users, their internal implementations need not be at all similar.
+			  The guts of an AMD chip implement the x86 ISA in a completely different way than Intel chips do.
+			  Now we'll move on to some hotspots where ISAs show a lot of variation.</p>
+		  </div>
+		  
+		  <div id="accessing-data">
+			<h3>Accessing Data</h3>
+			<p>Since the essential purpose of having a computer is to operate on data, ways to access it are a pretty essential part of any ISA.  We can store
+			  a limited amount of data in registers (exactly how limited an amount is an ISA design choice), but after we run out of room there we'll have to
+			  somehow work with stuff in memory, and different ISAs do this differently.</p>
+			<div id="registers">
+			  <h4>Registers</h4>
+			  <p>Registers are most basic way to work with data.  Almost all CPU operations expect their inputs exclusively in registers, so everything that 
+				we work with on a CPU is probably going to have to wind up in a register sooner or later.  Different ISAs specify different register sizes and
+				assembly-language mnemonics.  On most sane N-bit processor architectures, you have maybe 16 or 32 N-bit registers named <code>r0</code> to 
+				<code>r[N-1]</code>.  On 32-bit x86, you've got a bunch of 32-bit registers called things like <code>eax</code>, <code>edi</code>, and
+				<code>ebp</code>.  These names actually do make sense - skip to the next paragraph if you don't care why.  The first x86 chip, the 8086,
+				had a bunch of 16-bit registers including 4 "general purpose" registers: <code>ax</code>, <code>bx</code>, <code>cx</code>, and <code>dx</code>.
+				The X was because each half of every register could be addressed separately - <code>ah</code> for the high byte of <code>ax</code>, <code>al</code>
+				for the low byte.  When Intel moved to 32-bit, you could still use the old register names, but you meant the 16-bit registers.  The whole 32-bits of
+				the registers were denoted by an 'e' for 'extended'.  Hence, <code>eax</code>.  In addition to the general purpose registers, the 8086 had some other
+				registers that, either by convention or instruction set mandate, were 'special-purpose'.  One of these was <code>di</code>, the 'destination index'.
+				Certain instructions that copy entire strings of memory only work with <code>di</code> and its counterpart <code>si</code> (source index).  And
+				finally, <code>bp</code> stands for Base Pointer - it holds the 'base' address of the stack (the start of the region where local variables live).
+			  </p>
+			</div>
+			<div id="buses-addressing">
+			  <h3>Memory buses & addressing</h3>
+			  <p>Registers are pretty boring - once you've decided on a register machine architecture (the standard in hardware since pretty much forever), you can
+				tune the size of the registers and how many there are - that's about it.  Of course, there are other interesting things you can do like 
+				<a href="https://en.wikipedia.org/wiki/Register_window">register windows</a>, but they're outside the scope of this document (though the hope is that
+				by the end you'll be able to understand the design tradeoffs motivating such things, and the implications of adopting them).  Addressing memory, however,
+				is slightly more interesting.  Data travels to and from memory on the memory bus - which used to be a part of the generic system bus but is now (for
+				performance reasons) a direct link between the processor and the memory modules.  Design of the memory bus involves deciding what the smallest addressable
+				unit of memory is (on most computers, a byte), and how you uniquely specify each location in memory.  This is actually what is meant by an N-bit system -
+				a system that can address (uniquely specify) 2^N locations in memory.  More technically, it means the 'width of the address bus' - how many bits are being
+				used on the physical address bus to specify an address - but in these modern times we are spared the subtlety; they are nearly always the same.  Note that
+				an N-bit machine having N-bit registers is not a necessity - you could have a 24-bit machine with 32-bit registers, for example.  
+			  </p>
+			</div>
+			<div id="harvard-von-neumann">
+			  <h3>Harvard & von Neumann architectures</h3>
+			  <p> One of the most basic distinctions between computer systems resides in the way they treat memory.  There is more or less a dichotomy, although there are certainly hybrid approaches also.  On a von Neumann machine, code and data reside in the same address space.  This may sound obvious because almost all modern
+			  machine behave this way, but it was not always so.  With a Harvard architecture, code and data occupy different address spaces.  At first glance, it may seem
+			  that a Harvard architecture needlessly restricts the programmer, but on a closer look this is not a completely bad thing.  Almost all security exploits of software
+			  involve tricking a von Neumann machine into executing some code that you have placed in memory by feeding a program malformed data.  The most common of these is
+			  a buffer overflow, where you give a program input that is longer than the buffer it has allocated for you, causing it to write the excess of your input into
+			  other areas of memory.  The hope is that one of these locations will have previously been home to executable code, and you will be able to cause the program to
+			  jump it, hoping to find its own code, but instead finding your carefully-crafted <a href="https://en.wikipedia.org/wiki/Shellcode">shellcode</a>.  Since you
+			  might not be sure where exactly the program will jump, you might do something like a <a href="https://en.wikipedia.org/wiki/NOP_slide">NOP slide</a> in hopes
+			  of increasing the chances of your shellcode being executed.  As you can see, this attack fundamentally relies on code and data sharing the same address space -
+				if there were an insurmountable Berlin (*cough* Cambridge) Wall between them as in a Harvard architecture, you could never make this mistake.</p>
+			  <p>Harvard architectures can also be faster then von Neumann machines at certain things (if code & data are two different address spaces, you can read/write both
+				at the same time, for example), and the hardware can be simpler to implement.  But, in general, modern computer architects have considered giving up all the pros
+				of the von Neumann architecture too steep a price to pay - no von Neumann machines, no JITs, for example.  So, generally, Harvard architectures are only found in
+				smaller special purpose chips such as those used in DSP (digital signal processing).  That's not to say Harvard architectures haven't influenced modern CPU design
+				- almost all modern chips do implement some sort of tagging system in hopes of recapturing some of the security benefits of Harvard machines, and most have
+				separate caches for instructions and data.</p>
+			</div>
+			<div id="addressing-modes">
+			  <h3>Addressing modes</h3>
+			  <p>Now that we've defined our terms and suchlike, we can look at the real heart of the issue so far as ISA design is concerned - addressing modes.  The addressing
+				modes of a processor are the different ways you can specify places in memory to those instructions that can act on memory locations.  In the simplest possible
+				scheme, the only such instruction is a move instruction, and the only addressing mode is 'absolute' - you have to know the exact memory address beforehand (as 
+				in, at assemble-time).  However, this isn't very useful.  Want to index an array?  Too bad.  Now we have to cave and add (at the very least) a 'register-indirect'
+				mode, where we can specify a memory address as being the contents of some register.  In a perfect (or RISC - see Part IV) world, this is all we need.  However,
+				there are a bunch of other patterns in memory addressing that we could probably speed up if we added more hardware and more ISA complexity.  For example,
+				we might want C code to more easily access its local variables.  On x86, each local variable is usually stored at <code>ebp - K</code>, where K is the sum
+				of the sizes of all previously-declared local variables in the stack frame (in other words, a unique constant per local variable).  So we'll add another address 
+				mode that handles the register+constant case.  Oh, but you know what?  Indexing arrays is pretty common, so we'll probably want to do that.  For that we'll
+				need another addressing mode that lets us constant+index_register.  And so on, and so forth.  On x86, it ended up being the case that they made an entire
+				unit on the chip dedicated to calculating addresses - a sort of specialized ALU linked directly to the memory bus. </p>
+			  <p>This enabled one of my favorite low-level hacks of all time - the <code>lea</code> trick.  Since Intel put this whole adress-calculation-unit on the die, they
+				also gave the programmers an instruction that used it to calculate the 'effective address' and store it in a register - Load Effective Address, or
+				<code>lea</code>.  Since this specialized ALU could do fewer things than the 'real' ALU, it was often slightly faster for those operations it could do - 
+				calculations of the form base + K*index, generally, though this is nowhere near the maximum complexity achieavable.  
+				Because of this, and because of pipelining (see Part IV), it was (is?) considered a clever performance trick to use the <code>lea</code> instruction to do
+				ordinary arithmetic for you when you could.</p>				
+			</div>
+		  </div>
+		</div>		
+		<div id="building-system">
+		  <h2>Putting together the system</h2>
+		  <div id="osconcepts">
+			<h3>OS concepts</h3>
+			<p>...</p>
+		  </div>
+		 
+		  <div id="introc">
+			<h3>Introduction to C (for Java programmers)</h3>
+			<div id="cessence">
+			  <h4>The essence of C</h4>
+			  <p>Before embarking on a quest to learn C, I think it might be useful to understand the motivation for its design, and some of the core design philosophies
+				it chose as a result.  C is a language designed for writing operating systems.  Some people like to say things like "C is a language for systems programming",
+				which they intend to mean OSes and low-level userspace tools (maybe webservers and stuff).  That might be true, and certainly a lot of non-OS system-level
+				software is written in C, but the project for which C was created was to write the world's first OS in a high-level language (namely, Unix).  Because of this,
+				C chooses to be a fairly thin layer over assembly.  Compiler optimizations notwithstanding, it should be fairly easy to look at a piece of C code and see
+				a sketch of what assembly you'll get.  C also generally assumes you know what you're doing - you get enough rope to hang yourself and then some, and nobody's
+				going to catch you when you fall.  Lastly, since C is a language 'for' OS development, it shouldn't depend on anything - the C runtime should be nothing more
+				than a small number of functions you can call if you want, as opposed to doing things like dynamic type/bounds-checking and garbage collection (note that these
+				things would violate the transparency goal by making it difficult to know what assembly you'll get from the compiler).  To sum up, C is a great language
+				for being close to the <i>machine</i> - if that's what you need, C will serve you well.  If not, you won't have a good time. </p>
+			</div>
+			<div id="include-and-preprocessor">
+			  <h4><code>#include</code> and the preprocessor</h4>
+			  <p>Since in C (compared to Java) most of the control-flow concepts are the same, and most features (OOP, garbage collection) are simply absent, I'm going to
+				go over those areas were Java and C solve the same problem in different ways, or C solves a problem that Java sweeps under the rug. 
+			  <p>We'll start off with
+				code re-use.  In Java, our .java source files both <i>declare</i> and <i>define</i> things, and when we want to use code we (or someone else) has already
+				written, we "import" a "class".  This is much too fancy for C.  In C, you have two types of files: <code>.h</code> (header) files which <i>declare</i>
+				things, and <code>.c</code> (code) file which <i>define</i> them.  When you declare something, you're simply notifying the compiler that you will somewhere
+				later define it, and in return the compiler lets you use it in your code.  The way you 'import' the definitions in .h files is with the <code>#include</code>
+				directive.
+			  </p>
+			  <p>In Java, <code>import</code> is considered a statement just like <code>break</code> or <code>return</code> - it's parsed and understood by the same bit of
+				code that compiles the rest of your source.  In C, <code>#include</code> is NOT a statement, and it's never seen by the compiler proper.  Instead, there's
+				another program, the C preprocessor, which sees your source and modifies it before the compiler sees it.  All lines beginning with a # sign are for the 
+				preprocessor.  <code>#include "file.h"</code> tells the preprocessor to read the contents of file.h and paste them into the file just as they are - very
+				low-tech.  When specifying the name of the header to include, you can use angle brackets (example: <code>#include &lt;stdio.h&gt;</code>) or quotes (as before).
+				Angle brackets tell the preprocessor to look in the standard library for the header, quotes tell it to look in the current directory.  Note that the name in
+				quotes of angle-brackets is actually a filename, so you can have a hierarchy of headers and do things likie <code>#include "algorithms/sorting/heapsort.h"</code>.
+				Also note that there might or might not be a .c file for every .h - it might be an already-compiled object file (extensions .a, .o, .so) - but you use
+				it the same way.
+			  </p>
+			  <p>There are other preprocessor directives besides <code>#include</code>, I recommend reading <a href="https://en.wikipedia.org/wiki/C_preprocessor">Wikipedia</a>
+				if you feel like learning more about the preprocessor.  In case you were wondering, the C preprocessor is in fact Turing-complete (within the limitations of
+				compilers to let you include yourself as a means of recursion / looping), see <a href="http://www.ioccc.org/years-spoiler.html">the IOCCC</a> (International
+				Obfuscated C Code Contest) for an implementation of the Towers of Hanoi in the preprocessor (search for "hanoi").</p>
+			</div>
+			
+			<div id="zomg-pointers">
+			  <h4>Pointers</h4>
+			  <p>Now we arrive at the topic I was referring to when I mentioned "C solves a problem that Java sweeps under the rug" - pointers.  We know about assembly,
+				and we know about addressing modes, so it should be old news that one of the things you can store in a register is a memory location, and that you can
+				later do things like write into that location, read from it, etc.  A pointer is just a variable that stores a memory address of something.  The syntax
+				for declaring a pointer looks like: <br>
+				<code>T *myPointer;</code>
+				<br>
+				where T is any type.  </p>
+			  
+			  <p>Once you have a pointer (also called a reference), you can manipulate either it itself (the reference, the address, etc), or the thing at the address
+				it points to (the referent).  Manipulating <i>the reference itself</i> uses the variable name unadorned, while manipulating the <i>referent</i> you must
+				use a the * operator to <i>dereference</i> the pointer.  The inverse of * (pronounced 'dereference' or 'star') is & (addressof).  & takes 
+				<i>any variable</i> (including a pointer) and gives you a pointer to it.  This is confusing - let's look at some example code:</p>
+
+			  <pre><code>
+					int a = 4, b = 1024;
+					int *p = &a			//"p equals addressof a" - p now points to a
+					*p = 5;				//we are changing p's referent, AKA a - after this, if we read a, it will be 5
+					p = &b;				//we are changing p - it now refers to b
+					*p = 7;				//now (b == 7) is true
+					p = a;				//WRONG!  should give a compile warning - p and a are both numbers, but this assignment is almost certainly
+					//a bad idea, unless we want a pointer to memory address 4 (which will probably crash the program on read/write)
+			  </code></pre>
+			  
+			  <p>Like I said before, * and & are inverses, so applying them both is an identity:
+				<code>someVar == *(&someVar)</code> is always true
+				(note also from this example that * can be applied to any expression with pointer type)
+			  </p>
+			  
+				
+			  <p>A quick aside: C has things called lvalues and rvalues that you might hear about in compiler error messages.  An lvalue is something
+				that can appear on the left side of an equals sign (can be <i>assigned to</i>), an rvalue can only appear on the right side of an equals sign (can only be
+				<i>assigned from</i>).  & acts on lvalues ONLY - something like <code>int *p = &7</code> doesn't make sense any more than <code>7 = x</code>
+			  </p>
+			  
+			  <p>With a basic understanding of pointers, we are now equipped to talk about C arrays.  An array in C is just a block of memory with some length.  (it's
+				your job to keep track of the length, you can't ask an array it's length - it's just a block of memory!) The actual
+				'array variable' is just a pointer to the 0th element, so array subscripting is just pointer arithmetic:<br>
+				<code>array[idx] == *(array + idx)</code><br>
+				There is a very important and subtle point (heh) here, don't miss it: The 'unit' in pointer arithmetic is <i>always</i> the size of the type of the pointer. 
+				(C gives you the <code>sizeof</code> operator to find out the size of things in bytes: <code>sizeof(variable)</code> or <code>sizeof(type)</code> evaluates to
+				the size (in bytes) of the type).
+				If you said that <code>ptr+1</code> was always the address of ptr plus one byte, then you would have to do a multiplication by <code>sizeof(*array)</code> (note
+				that since the variable 'array' is a pointer, <code>sizeof(array)</code> would give us the size of a pointer, which is the same no matter what it points to)
+				in the above array-subscripting example.  C assumes that would be annoying, so it effectively is doing it for you.  The way to get the address of a pointer 
+				'plus N bytes' is to cast the pointer to <code>char *</code> before doing the pointer arithmetic.  Example: to get a pointer 7 bytes into a block of memory
+				pointed at by 'myPtr':<code>char *sevenBytesPast = ((char *)myPtr) + 7</code>
+			  </p>
+			  
+			  <p>Strings in C are just arrays of type <code>char</code>, which is to say that they are just char pointers.  By convention (your program will likely crash
+				if you don't obey this convention) the end of a C-string is marked by a byte with value 0 - called a 'null terminator'</p>
+			  
+			  <p>The array-pointer duality has some interesting results.  One of them is that it is very easy to pass a function the 'last N' cells of an array - just call
+				<code>function(array + (N - S))</code> (where S is the size of the array).  So for example here's a binary search function (it's probably buggy but it illustrates
+				the basic idea):
+			  </p>
+			  <!--			  <pre><code>
+							  int binsearch(int[] ar, int key, int size) {	//search the first 'size' cells in 'ar' for 'key'
+							  if (size == 0)
+							  return -1;
+							  int mid = size / 2;
+							  if (ar[mid]  > key)
+							  return binsearch(ar, key, mid - 1);
+							  if (ar[mid] < key)
+							  return binsearch(ar + mid + 1, key, mid);
+							  else return ar[mid];
+							  }
+							  </pre></code>			  !-->
+			</div>
+			
+			<div id="structunion">
+			  <h4><code>struct</code> & <code>union</code></h4>
+			  <p>It is often useful to group a number of variables into one package that can be manipulated as a unit, we might for example want to define 2D points by
+				grouping two ints, x and y.  The tool C gives you to do that is a <code>struct</code> (structure).  You can think of a struct as an object with no methods,
+				just public data members.  Example:
+				<pre><code>
+					struct point {
+						int x, y;
+					}
+
+					//now the name of the type is 'struct point' - we would write
+					struct point reflect(struct point p) {
+						struct point np;
+						np.x = p.y;
+						np.y = p.x;
+						return np;
+					}
+					
+					//if we don't like that, we can use typedef:
+					typedef struct {
+						int x, y;
+					} point;
+					
+					//now we can use 'point' just like any other type.
+				</code></pre>
+				</p>
+			  <p>However, there is also another case - where one unit can have multiple possible values, but only one at a time.  To do this, C gives us unions - 
+				whereas sizeof(struct S) is the sum of its member variable sizes, sizeof(union U) is the <i>maximum</i> of its member variable sizes.  Writing to a
+				field in a union leaves all other fields in an undefined state, because their space is being used to store the value you just wrote.  Since only the last-written
+				member of a union is ever valid, unions are often nested inside structs which contain the union and a 'tag' identifying what type the union currently represents.
+				I wouldn't go so far as to call unions esoteric, but you might not 'see' situations where they are a good idea if you come from Java which has no analogous
+				concept, and so you might not use them a lot. </p>
+			</div>
+			
+			<div id="mallocfree">
+			  <h4>Dynamic memory allocation: <code>malloc</code> & <code>free</code></h4>
+			  <p>Not all quantities are known at compile-time.  If we ask for input from the user, we could just declare a really big static array (fixed-size) and hope they
+				don't go over (or we can't store it, potentially with a buffer overflow vulnerability).  Or we could allocate memory dynamically, and ask the system to 
+				provide us with more memory at runtime.  In Java, you do this with the <code>new</code> keyword - you just create a new object and Java worries about where
+				the memory comes from and where it goes when you are done.  Not so in C.  In C dynamic memory allocation is done by a regular old function that lives in the
+				header &lt;stdlib.h&gt;, called <code>malloc</code>.  The type declaration for malloc looks like: <code>void *malloc(size_t size)</code>.  size_t is an
+				unsigned (positive only) integer type used to represent, well, size.  <code>void *</code>, a "void pointer", represents a pointer to a block of memory that
+				holds values of some indeterminate type.  Since C has no generics or templates, this is all malloc can give you - you have to cast it to what you want yourself.
+				To allocate an array of ints with some variable size:
+				<br>Java: <code>int[] dynArray = new int[size];</code>
+				<br>C:<code>int *dynArray = (int *)malloc(size * sizeof(int)); </code>
+				<br>Note that the C version actually uses pointers instead of arrays.  They're the same thing (sort of) as we discussed, and it's easier and customary to just
+				use pointers with malloc, even if you are allocating things you might call 'arrays'</p>
+			  <p>Memory management in C has another dimension: freeing memory when you are done!  In Java the runtime has a garbage collector that finds memory that you are not using for anything anymore and reclaims it so the same space can be eaten by future calls to <code>new</code>.  In C you have to do this yourself, by calling another regular old
+				function, <code>free</code>.  free just takes one argument, the same pointer you got from malloc (since it is declared as void* in free's argument list, you
+				needn't cast it back to void* yourself).  If you free something and then try to use it - you get undefined behavior (often a crash).  If you free something and 
+				then try to free it again - probably a crash.  If you never free anything you'll keep going until eventually you will run out of memory, at which point 
+				<code>malloc</code> will return <code>NULL</code> (an edge case worth checking for).  This (not freeing memory) is called a memory leak.  Ever used a program
+				or game than ran smoothly the first few minutes and then got real, real slow?  Probably a memory leak.  </p>
+			</div>
+			
+		  </div>		  
+		</div>
       </section>
     </div>
 
