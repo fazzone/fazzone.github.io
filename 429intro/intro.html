@@ -71,7 +71,7 @@
 				<li>Representing programs:
 				  <ol>
 					<li>Machine code</li>
-					<li>Introduction to assembly language</li>
+					<li>Assembly language</li>
 				  </ol>
 				</li>
 			  </ol>
@@ -397,7 +397,7 @@
 					of the minor insanity which caused them to design systems based on BCD.  Therefore, you might find yourself using the EBCDIC character set on a system
 					that uses regular two's-complement to represent numbers.  This has the interesting consequence that 'a'+1 $\ne$ 'b', for example, and you cannot write
 					an <code>isLowerCase</code> function as a simple range check.  Much like BCD, EBCDIC is today mostly a curiosity - a story told to young
-					programmers to scare them into using the library versions of functions like <code>isLowerCase</code>, which are at least more likely to run on such
+					programmers to scare them into using the library versions of functions like <code>isLowerCase</code>, which are more likely to work on such
 					systems strange enough to use EBCDIC.
 
 				</div>
@@ -452,6 +452,46 @@
 			  
 			  <div id="code">
 				<h4>Representing code</h4>
+				<p>Now that we know about canonical representation of various common types of data, and, more importantly, know that any and all data representations 
+				  are just made-up associations between bit patterns and whatever it is we're representing - we should discuss how to represent the executable code
+				  that operates on this data.  Like the choice between One's Complement and Two's Complement for integer representations, this choice is mostly driven
+				  by hardware people - in this section we're talking about the final representation of executable programs that the hardware CPU executes directly.</p>
+				<div id="machinecode">
+				  <h5>Machine code</h5>
+				  <p>The name for this representation is machine code.  If we have some data in memory and we want a processor to do things with that data, the only
+					way to do that is write a bunch of arcane bit patterns into memory that specify in exacting, unambigious, and processor-specific detail what we
+					want done, and then instruct the processor to begin executing at that address.  This fact, however, is not really visible in ordinary, high-level
+					programming, simply because we are so good at abstracting & automating it.  A machine code instruction might tell the processor to add two numbers
+					stored in registers (small, on-chip data storage), whereas if we are using a high-level language a single conceptual "line" might be more like
+					<br>
+					<code>r = (sqrt(b^2 - 4*a*c) - b)/(2*a) //apply quadratic formula</code> 
+					<br>
+					The art and the science of programming is breaking up your big high-level concepts into bite-sized concepts for the programming environment, and
+					the challenge of machine-level programming is that the definition of 'bite-sized' is very small, and the bite-sized concepts that you get are
+					optimized for the hardware's ease of understanding, not yours.</p>
+				  <p>In machine code, each "line" - the smallest discrete unit of the program - is a bit-pattern called an 'opcode'.  Each possible thing that you can
+					tell the processor to do needs its own opcode (otherwise, how would you tell it apart from the others?).  This seems obvious, but what I mean here
+					is that, for example, the opcode that encodes "add the number in the eax register to the number in the ecx register" and the one that encodes
+					"add the number in the ebx register to the ebp register" (x86 has strange register names) need not be similar at all.  It does end up happening in
+					real life that they are usually very similar, just because it is easier to build the instruction-decode hardware that way (and because it would be
+					terrible engineering if they were not similar) - but the point is that there is some fixed amount of possible things that the processor can do in
+					one clock cycle, and all "programming" is at the machine level is putting the right opcodes in the right sequence</p>
+				</div>
+				<div id="assembly">
+				  <h5>Assembly language</h5>
+				  <p>Sooner or later, someone realized that programming by flipping switches to represent bit patterns in individial opcodes sucked - it would be much
+					easier if you could just write down a list of all the opcodes you wanted the machine to do using some system of mnemonics - that way you wouldn't
+					have to know all the opcodes by heart (or have a reference book handy).  This is assembly language.  The important thing to note here is that
+					the only thing assembly language accomplishes is letting you refer to instructions as (example) "ADD" instead of 0xEF or whatever the opcode is.
+					No abstraction is going on - the assembler (program that translates assembly to executable machine code) is basically just doing parsing and table
+					lookup.  The other thing that most assemblers will let you do is give specific points in your program labels, so that when you want to jump back
+					to those points, you can give the label and the assembler will replace it with the actual numerical address - this way you don't have to update
+					the constants every time you add or remove code in the middle of the program. </p>
+				  <p>An important thing to note is that while each processor has only one system of assigning opcodes (an ISA, more on that next section), anyone
+					can write an assembler that translates whatever mnemonics and whatever way of specifying opcodes that they want - so while an assembler can only
+					sensibly have one particular machine language as a target, there's no limit on the number of assembly languages that can be created for a machine.
+				  </p>
+				</div>
 			  </div>
 		  </div>
 		</div>
