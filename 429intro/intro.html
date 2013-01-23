@@ -127,7 +127,7 @@
 				<li>Counterpoint: Introduction to Lisp
 				  <ol>
 					<li>The essence of Lisp</li>
-					<li>Symbols & S-expressions</li>
+					<li>Symbols, lists, and S-expressions</li>
 					<li>Cons cells</li>
 					<li><code>eval</code></li>
 					<li>Memory management in Lisp</li>
@@ -673,12 +673,14 @@
 					p = &b;				//we are changing p - it now refers to b
 					*p = 7;				//now (b == 7) is true
 					p = a;				//WRONG!  should give a compile warning - p and a are both numbers, but this assignment is almost certainly
-					//a bad idea, unless we want a pointer to memory address 4 (which will probably crash the program on read/write)
+					//a bad idea, unless we want a pointer to memory address 5 (which will probably crash the program on read/write)
 			  </code></pre>
 			  
 			  <p>Like I said before, * and & are inverses, so applying them both is an identity:
 				<code>someVar == *(&someVar)</code> is always true
 				(note also from this example that * can be applied to any expression with pointer type)
+				Be careful, though, because <code>&(*someVar)</code> is <i>not</i> the same thing - this will be a type error for all <code>someVar</code>s of
+				non-integral type, and probably cause a crash for those of integral type (by trying to access a memory location the program probably does not own).
 			  </p>
 			  
 				
@@ -702,7 +704,17 @@
 			  </p>
 			  
 			  <p>Strings in C are just arrays of type <code>char</code>, which is to say that they are just char pointers.  By convention (your program will likely crash
-				if you don't obey this convention) the end of a C-string is marked by a byte with value 0 - called a 'null terminator'</p>
+				if you don't obey this convention) the end of a C-string is marked by a byte with value 0 - called a 'null terminator'.  This is a frequent source of C 
+				program errors - if you forget to put a null terminator on the end of your string, the standard string-handling functions (or ones that you write) will
+				not know where the end of the string is, and just blindly keep going until they crash the program.  In contrast, the language Pascal, which predates C by 2 years, 
+				chose to keep the length of strings in an integer before the character at index 0 - each approach has its advantages and disadvantages.  C strings have
+				the aforementioned problems if you forget to allocate room for and add a null terminator, and it is O(n) to find the length of a string,
+				but Pascal strings can (in some implementations) be limited
+				in length to 255 bytes (since the first byte which stores the length is just that - a byte).  Thus, if you have very limited memory, C string are attractive,
+				as they cost you only one byte of overhead to store strings of any length.  Also, zero-terminated strings were already common in the assembly languages of 
+				the machines (DEC PDP series) which C was first developed on.  With that said, however, C's use of null-terminated strings is one of the design decisions
+				that has not stood the test of time particualrly well - almost all languages since C (including C++) have a string type which maintains the length of the
+				string in an integer.</p>
 			  
 			  <p>The array-pointer duality has some interesting results.  One of them is that it is very easy to pass a function the 'last N' cells of an array - just call
 				<code>function(array + (N - S))</code> (where S is the size of the array).  So for example here's a binary search function (it's probably buggy but it illustrates
@@ -771,16 +783,134 @@
 				<br>C:<code>int *dynArray = (int *)malloc(size * sizeof(int)); </code>
 				<br>Note that the C version actually uses pointers instead of arrays.  They're the same thing (sort of) as we discussed, and it's easier and customary to just
 				use pointers with malloc, even if you are allocating things you might call 'arrays'</p>
-			  <p>Memory management in C has another dimension: freeing memory when you are done!  In Java the runtime has a garbage collector that finds memory that you are not using for anything anymore and reclaims it so the same space can be eaten by future calls to <code>new</code>.  In C you have to do this yourself, by calling another regular old
+			  <p>Memory management in C has another dimension: freeing memory when you are done!  In Java the runtime has a garbage collector that finds memory that you are
+				not using for anything anymore and reclaims it so the same space can be eaten by future calls to <code>new</code>.  In C you have to do this yourself, by calling another regular old
 				function, <code>free</code>.  free just takes one argument, the same pointer you got from malloc (since it is declared as void* in free's argument list, you
 				needn't cast it back to void* yourself).  If you free something and then try to use it - you get undefined behavior (often a crash).  If you free something and 
 				then try to free it again - probably a crash.  If you never free anything you'll keep going until eventually you will run out of memory, at which point 
 				<code>malloc</code> will return <code>NULL</code> (an edge case worth checking for).  This (not freeing memory) is called a memory leak.  Ever used a program
 				or game than ran smoothly the first few minutes and then got real, real slow?  Probably a memory leak.  </p>
-			</div>
-			
+			</div>		
 		  </div>		  
+		  
+
+		  <div id="introlisp">
+			<h3>Counterpoint: Introduction to Lisp</h3>
+			<div id="lispessence">
+			  <h4>The essence of Lisp</h4>
+			  <p>
+				Before starting into this section, I'd just like to offer a word of apology for introducing Lisp after and in for the purpose of contrast with C - Lisp in general
+				is not subordinate to C in the way this section is subordinate to the C-section.  With that said, however, the contrast between C and Lisp is a very important one
+				to understand in computer science and software engineering, and is often considered as an archetype for similar contrasts.  One of the most famous short articles
+				in software engineering is <a href="http://www.jwz.org/doc/worse-is-better.html">"The Rise of 'Worse is Better'"</a> which does exactly these things, and which I 
+				will sort-of summarize/adapt in this section in an attempt to get at the essence of Lisp.</p>
+			  <p>The two more general approaches to software design that are contrasted in the articl using C and Lisp as examples are the "MIT approach" and the "New Jersey approach".
+				(Lisp was developed at MIT, C and Unix were developed at Bell Labs in New Jersey).  Both approaches value the same things (approximately), the difference is in their
+				priorities.  To a devotee of the MIT approach, the critical goal of a design is to be correct - the artifact produced must be "the right thing".  The New Jersey approach
+				values correctness, but subordinates it ever-so-slightly to simplicity of interface and implementation.  If the improvement to go to 90% correct to 99% correct costs
+				a great deal in terms of simplicity, at MIT it is worth it to sacrifice simplicity (simplicity of implementation being easier to sacrifice than simplicity of interface)
+				to have "the right thing", where at Bell Labs the simpler system is preferred.  For a more in-depth discussion, I encourage you to read the linked-to article.  My reason
+				for bringing this up is that I'd like you to keep in mind the issues of simplicity and correctness, and especially differing choices in tradeoffs between the two, as we
+				discuss Lisp.</p>
+			  <p>
+				With that out of the way, we can start to really get at the 'essence of Lisp'.  In a few words, I would say that this is that Lisp is a notation for computation.  Already
+				this should seem a more mathematical (and loftier) goal than C's, and indeed it is.  John McCarty, the inventor of Lisp, originally intended it for use by mathematicians
+				and theoretical computer scientists, and was in fact surprised to learned that it could actually be implemented on contemporary (1958) harware - an IBM 704.  Becuase of its
+				extreme age, and the fact that its original intent was not to be a programming language, "Lisp" today refers to a family of many different dialects, most with several 
+				implementations - Common Lisp, Scheme, the newcomer Clojure, and countless others.  Since Lisp much more unlike Java than C, it is difficult to get any more specific
+				in this 'essence' section - so let's just get started.
+			  </p>
+			</div>
+		  </div>
+		  <div id="symbolslistssexprs">
+			<h4>Symbols, lists, and S-expressions</h4>
+			<p>The smallest unit of a Lisp expression is (appropriately) called an 'atom'.  Atoms can be either a number or a data type unique to Lisp, called a <i>symbol</i>.  A symbol is 
+			  just a word - no quotes, because it's not a string.  The other entitiy Lisp deals with is the list (Lisp being an acronym for LISt Processing).  List elements can be either atoms
+			  or other lists.  The empty list has a special name, <i>nil</i>.</p>
+			<p>Now that we know what symbols & lists are, it would be fitting to look at some examples.  However, to do that we must first agree on a notation for them - most importantly lists. 
+			  The most common notation for Lisp today is the S-expression (S for symbolic), which uses parens and spaces to represent lists: <code>(this is a list)</code>.  Here are some example
+			  s-expressions:
+			  <ul>
+				<li><code>()</code> - the empty list/nil</li>
+				<li><code>foobar</code> - nothing wrong with naked atoms</li>
+				<li><code>(1 2 3 4)</code> - some numbers</li>
+				<li><code>(A B C 1 3 4 D E F words and stuff)</code> - some symbols and numbers intermixed</li>
+				<li><code>(this (is an (example of) a (nested)) s-expression)</code> - Lists can be contained in other lists</li>
+			  </ul></p>
+			<p>
+			  All that Lisp is is a system for evaluating S-expressions.  The way we evaluate an S-expression is as follows: if it is an atom, leave it untouched.  If it is a list, we will assume
+			  that the first element is a symbol, which names a function, and the rest of the list are arguments to that function - the S-expression evaluates to whatever the function returns.
+			  To give our system some basic utility, let's define some functions.  The easy ones first:</p>
+			  <ul>
+				<li><code>(quote x)</code> will evaluate simply to <code>x</code>.  <code>(quote x)</code> is often abbreviated <code>'x</code>.</li>
+				<li><code>(atom x)</code> returns the atom <code>t</code> if <code>x</code> is an atom, and the empty list <code>()</code> otherwise.</li>
+				<li><code>(eq x y)</code> returns the atom <code>t</code> if <code>x</code> and <code>y</code> are both the same atom, or both <code>()</code></li>
+				<li><code>(first x)</code> assumes <code>x</code> is a list and returns its first element.</li>
+				<li><code>(rest x)</code> is the dual to <code>first</code> - it assumes <code>x</code> is a list and returns everything <i>but</i> its first element</li>
+				<li><code>(cons x y)</code> is the inverse of <code>first</code> and <code>rest</code> - it returns a list with <code>x</code> as the first element, followed by the list <code>y</code></li>
+			  </ul>
+			  <p>
+				The next one slightly more complicated.  It's called <code>cond</code>, for conditional, and works like this:<code>(cond ((c1) e1) ((c2) e2) ...)</code> evaluates all of the c1, c2,
+			  ... expressions until one evaluates to the atom <code>t</code> (for 'true', if you haven't noticed), and returns the corresponding eN expression.  Let's see some examples (input preceeded by &gt;, output
+			  on following line, ; starts a comment)
+			  </p>
+			  <pre>
+				<code>
+				> (quote atom)
+					atom
+				> (quote (this is a list))
+					(this is a list)
+				> (atom 'things)
+					t
+				> (atom (things and stuff))
+					;; error - 'things' does not name a function
+				> (atom (quote (things and stuff)))
+					()
+				> (eq 'things 'stuff)
+					()
+				> (eq 'things 'things)
+					t
+				> (eq '(some list) '(some list))
+					() ;;refer to definition of eq if you expected otherwise
+				> (first '(1 2 3 4))
+					1
+				> (rest '(1 2 3 4))
+					(2 3 4)
+				> (cons 1 '(2 3 4))
+					(1 2 3 4)
+				> (cond
+				>    ((eq 'a 'b) 1)
+				>    ((eq 'a 'c) 'two)
+				>    ((eq 'a 'a) 3))
+					3
+				</code>
+			  </pre>
+			  <p>It is interesting to note that some of these functions expect their arguments to be evaluated (first, rest, cons, eq, atom), while for others it is critical that the arguments <i>not</i> be evaluated.
+				Those that expect evaluated arguments we will call functions, and I'll punt and just call the other 'special' for now.
+				Now that we have a definition for a function, let's create a notation for defining them.  We call this <code>lambda</code> (for historical reasons), and it works like this: <code>((lambda (a1 a2 ...) body) v1 v2)</code>
+				will evaluate <code>body</code> with the proviso that any occurrences of any of the aN atoms (they must be atoms) in it are replaced with the corresponding vN expression.  This is tricky, so let's see some examples:
+			  </p>
+			  <pre><code>
+				  > ((lambda (a) (eq a 'b)) 'b)
+				      t
+				  > ((lambda (a) (eq a 'a)) 'b)
+				      ()
+				  > ((lambda (a b) (cons b a)) '(1 2 3) 0)
+				      (0 1 2 3)
+				  > ((lambda (a) 7) 'ignored)
+				      7
+				  > ((lambda (f) (f 'word)) atom)
+				      t  ;;different Lisp dialects disagree about this
+			  </pre></code>
+			  <p>
+				Note that the functions we create with <code>lambda</code> are anonymous - so re-using functions, and writing recursive functions, while not "impossible", would sort of suck - so let's define a new form
+				for associating a symbol with a value, which we can then use to give our functions names.  We'll call it <code>set</code> - <code>(set name value)</code> will cause all subsequent unquoted uses of <code>name</code>
+				to evaluate to <code>value</code>.  To give a function a name, we would do <code>(set fname (lambda (args...) body))</code>, which we'll abbreviate <code>(defn name (args...) body)</code>.
+			  </p>
+		  </div>
+
 		</div>
+		
       </section>
     </div>
 
@@ -792,4 +922,3 @@
     </div>
   </body>
 </html>
-
