@@ -4,7 +4,7 @@ function drawParams() {
 	//Square colors shamelessly stolen from how Wikipedia draws chessboards
 	 this.color_whiteSquare = "#FFCE9E";
 	 this.color_blackSquare = "#D18B47";
-	 this.color_annotation = "#000000";
+	 this.color_annotation = "#AF1111"; //TODO make this not look bad
 	 //what fraction of the width/height are we going to inset annotations by? (to center them)
 	 this.annotation_inset = 1/3;
 }
@@ -13,8 +13,14 @@ function drawParams() {
 function drawSquare(ctx, params, row, col) {
 	ctx.fillStyle = (row % 2 == col % 2) ? params.color_whiteSquare : params.color_blackSquare;
 	ctx.fillRect(col * params.sqwidth, row * params.sqheight, params.sqwidth, params.sqheight);	
-	drawCircle(ctx, params, row, col);
-	drawCross(ctx, params, row, col);
+
+	if (row == 0) {
+		ctx.fillStyle = "black";
+		ctx.fillText("\u2655", (1/2 + col) * params.sqwidth, (row + 1/2) * params.sqheight);		
+		drawCross(ctx, params, row, col);
+	}
+	else 	drawCircle(ctx, params, row, col);
+
 }
 
 
@@ -25,7 +31,7 @@ function drawCross(ctx, params, row, col) {
 	
 	ctx.scale(params.sqwidth, params.sqheight);
 	ctx.strokeStyle = params.color_annotation;	
-	ctx.lineWidth = 0.1;	//made up
+	ctx.lineWidth = 0.06;	//made up
 
 	var ins = params.annotation_inset;	
 	ctx.beginPath();
@@ -43,7 +49,7 @@ function drawCircle(ctx, params, row, col) {
 	ctx.save();
 	
 	ctx.scale(params.sqwidth, params.sqheight);
-	ctx.fillStyle = "white";
+	ctx.fillStyle = params.color_annotation;
 
 	var ins = params.annotation_inset;	
 	ctx.beginPath();
@@ -68,6 +74,13 @@ function init() {
 	m_params = params;
 	
 	var ctx = cvs.getContext('2d');
+	
+	//set some text rendering options just the way we like them
+	ctx.textBaseline = "middle";
+	ctx.textAlign = "center";
+	ctx.font = "60pt Arial"; //TODO variable font size
+
+	
 	m_ctx = ctx;
 	drawBoard(ctx, params);
 }
