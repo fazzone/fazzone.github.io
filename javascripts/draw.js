@@ -1,9 +1,9 @@
-//draw.js - all drawing/canvas-related code goes here
+\//draw.js - all drawing/canvas-related code goes here
 
 function sizeCanvas() {
 	var canvas = document.getElementById("schc");
-	canvas.width = window.innerWidth;
-	canvas.height = window.innerHeight;
+	canvas.width = window.innerWidth * window.devicePixelRatio;
+	canvas.height = window.innerHeight * window.devicePixelRatio;
 }
 
 function estimateTextFont(cHeight) {
