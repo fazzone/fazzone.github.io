@@ -1,4 +1,4 @@
-\//draw.js - all drawing/canvas-related code goes here
+//draw.js - all drawing/canvas-related code goes here
 
 function sizeCanvas() {
 	var canvas = document.getElementById("schc");
